@@ -4,6 +4,7 @@ import re
 import tempfile
 import traceback
 import zipfile
+from typing import Any
 from collections import defaultdict
 from os import path
 from urllib.request import Request, urlopen
@@ -18,7 +19,7 @@ def load_json(json_path: str) -> dict:
         return json.load(f)
 
 
-def save_json(json_path: str, data: any) -> dict:
+def save_json(json_path: str, data: Any):
     with open(json_path, "w") as f:
         return json.dump(data, f, indent=2)
 

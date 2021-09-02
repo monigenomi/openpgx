@@ -1,4 +1,5 @@
 import re
+from typing import Any
 from collections import defaultdict
 from typing import Optional
 
@@ -40,7 +41,7 @@ def fetch(query: str) -> list:
         return [dict(result) for result in curs.fetchall()]
 
 
-def get_index(columns) -> any:
+def get_index(columns) -> Any:
     if callable(columns):
         return columns
 
@@ -50,7 +51,7 @@ def get_index(columns) -> any:
     return lambda item: item[columns]
 
 
-def create_index(data: list, columns: any) -> dict:
+def create_index(data: list, columns: Any) -> dict:
     index_fn = get_index(columns)
     index = defaultdict(list)
     for item in data:
@@ -64,7 +65,7 @@ def create_index(data: list, columns: any) -> dict:
     return dict(index)
 
 
-def normalize(table: str, record: any) -> any:
+def normalize(table: str, record: Any) -> Any:
     if table == "recommendation":
         if record["drugrecommendation"] == "No recommendation":
             return None
@@ -89,7 +90,7 @@ def fetch_all(table):
     return DATA[table]
 
 
-def select(table: str, columns: any, values: any) -> list:
+def select(table: str, columns: Any, values: Any) -> list:
     if type(values) != list:
         values = [values]
 
@@ -115,7 +116,7 @@ def select(table: str, columns: any, values: any) -> list:
     return list(results.values())
 
 
-def find(table: str, columns: any, values: any) -> Optional[dict]:
+def find(table: str, columns: Any, values: Any) -> Optional[dict]:
     results = select(table, columns, values)
 
     if len(results) > 0:
