@@ -10,6 +10,7 @@ from .helpers import (
     is_star,
     get_phenoconversion_data_from_recommendations,
     format_with_populations,
+    download_to_cache_dir,
 )
 
 
@@ -211,10 +212,19 @@ def load_dpwg_entry(gene_drug_filename: str) -> dict:
     }
 
 
-def get_dpwg_recommendations() -> dict:
+# TODO - saved json contains only default recommendations with empty factors, but shoudln't
+
+DPWG_DEFAULT_URL = (
+    "https://api.pharmgkb.org/v1/download/file/data/dosingGuidelines.json.zip"
+)
+
+
+def get_dpwg_recommendations(url=DPWG_DEFAULT_URL) -> dict:
+    cache_dir = download_to_cache_dir(url, "dpwg")
+
     wildcard = path.join(
         path.dirname(path.realpath(__file__)),
-        "../../data/dpwg/Annotation_of_DPWG_*.json",
+        f"{cache_dir}/Annotation_of_DPWG_*.json",
     )
 
     entries = [load_dpwg_entry(filename) for filename in glob.glob(wildcard)]

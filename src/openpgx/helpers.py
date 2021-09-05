@@ -1,8 +1,14 @@
 import json
+import os
 import re
+import tempfile
 import traceback
+import zipfile
 from collections import defaultdict
+from os import path
+from urllib.request import Request, urlopen
 
+import appdirs
 from loguru import logger
 from termcolor import colored
 
@@ -175,3 +181,40 @@ def format_with_populations(recommendations_by_population: dict) -> str:
 
 
 # assert normalize_gene_and_factor("HLA-A*31:01", "*31:01 positive") == ("HLA-A*31:01", "positive")
+def download_url(url: str, save_path: str):
+    request = Request(
+        url=url,
+        headers={
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0) Gecko/20100101 Firefox/91.0"
+        },
+    )
+    response = urlopen(request)
+    with open(save_path, "wb") as file:
+        file.write(response.read())
+
+
+def get_cache_dir(subdir=None):
+    cache_dir = path.join(appdirs.user_cache_dir("openpgx"), subdir)
+
+    if not path.exists(cache_dir):
+        os.makedirs(cache_dir)
+
+    return cache_dir
+
+
+def download_to_cache_dir(url, subdir_name):
+    cache_dir = get_cache_dir(subdir_name)
+
+    if url.endswith(".zip"):
+        with tempfile.TemporaryDirectory(prefix="openpgx") as tmpdirname:
+            filename_path = path.join(tmpdirname, path.basename(url))
+            download_url(url, filename_path)
+
+            with zipfile.ZipFile(filename_path, "r") as zip_ref:
+                zip_ref.extractall(cache_dir)
+
+            return cache_dir
+    else:
+        download_path = path.join(cache_dir, path.basename(url))
+        download_url(url, download_path)
+        return download_path

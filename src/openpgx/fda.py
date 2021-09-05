@@ -1,5 +1,3 @@
-from os import path
-
 from .helpers import *
 
 STRENGTH_MAPPING = {"recommendation": "strong", "impact": "moderate", "pk": "optional"}
@@ -63,17 +61,21 @@ def subgroups_to_factors(subgroups: str) -> list:
     return factors
 
 
-def read_fda_entries():
-    base_dir = path.join(path.dirname(path.realpath(__file__)), "../../data/fda/")
-    return load_json(path.join(base_dir, "fda_pgx_associations_table.json"))["table"]
+def read_fda_entries(fda_json_path):
+    return load_json(fda_json_path)["table"]
 
 
 def get_fda_phenoconversion_data(recommendations):
     return get_phenoconversion_data_from_recommendations(recommendations)
 
 
-def get_fda_recommendations() -> list:
-    entries = read_fda_entries()
+FDA_DEFAULT_URL = "https://raw.githubusercontent.com/PharmGKB/fda-biomarker/master/fda_pgx_associations_table.json"
+
+
+def get_fda_recommendations(url=FDA_DEFAULT_URL) -> list:
+    fda_json_path = download_to_cache_dir(url, "fda")
+
+    entries = read_fda_entries(fda_json_path)
 
     result = defaultdict(list)
 
