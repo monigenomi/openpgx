@@ -201,7 +201,11 @@ def get_cpic_info(name: str, genotype: list) -> Optional[dict]:
             gene=name,
         )
 
-    gene_result = select("gene_result", ("genesymbol", "result"), (gene, phenotype),)[0]
+    gene_result = select(
+        "gene_result",
+        ("genesymbol", "result"),
+        (gene, phenotype),
+    )[0]
 
     return {
         "alleles": alleles,

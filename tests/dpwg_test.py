@@ -1,5 +1,5 @@
-from src.openpgx.dpwg import *
-from src.openpgx.helpers import *
+from openpgx.dpwg import *
+from openpgx.helpers import *
 
 DPWG_RECOMMENDATIONS = get_dpwg_recommendations()
 

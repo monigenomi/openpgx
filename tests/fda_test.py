@@ -1,5 +1,5 @@
-from src.openpgx.fda import *
-from src.openpgx.helpers import *
+from openpgx.fda import *
+from openpgx.helpers import *
 
 FDA_RECOMMENDATIONS = get_fda_recommendations()
 

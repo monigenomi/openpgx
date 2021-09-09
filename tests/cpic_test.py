@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 
-from numpy.testing import assert_equal
-
-from src.openpgx.cpic import *
-from src.openpgx.helpers import *
+from openpgx.cpic import *
+from openpgx.helpers import *
 
 CPIC_RECOMMENDATIONS = get_cpic_recommendations()
 
 
 def test_normalize_activityscore():
-    assert_equal(normalize_activityscore("No result"), None)
-    assert_equal(normalize_activityscore("n/a"), None)
-    assert_equal(normalize_activityscore("1"), "== 1.00")
-    assert_equal(normalize_activityscore("≥4"), ">= 4.00")
-    assert_equal(normalize_activityscore("4.25"), "== 4.25")
+    assert normalize_activityscore("No result") == None
+    assert normalize_activityscore("n/a") == None
+    assert normalize_activityscore("1") == "== 1.00"
+    assert normalize_activityscore("≥4") == ">= 4.00"
+    assert normalize_activityscore("4.25") == "== 4.25"
 
 
 def test_get():

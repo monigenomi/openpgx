@@ -1,5 +1,5 @@
-from src.openpgx.dpwg import get_dpwg_recommendations
-from src.openpgx.helpers import *
+from openpgx.dpwg import get_dpwg_recommendations
+from openpgx.helpers import *
 
 
 def test_index_table_by_something():

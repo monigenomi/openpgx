@@ -72,7 +72,7 @@ def get_fda_phenoconversion_data(recommendations):
 FDA_DEFAULT_URL = "https://raw.githubusercontent.com/PharmGKB/fda-biomarker/master/fda_pgx_associations_table.json"
 
 
-def get_fda_recommendations(url=FDA_DEFAULT_URL) -> list:
+def get_fda_recommendations(url=FDA_DEFAULT_URL) -> dict:
     fda_json_path = download_to_cache_dir(url, "fda")
 
     entries = read_fda_entries(fda_json_path)
