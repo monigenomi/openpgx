@@ -9,23 +9,20 @@ def test_get_all_drugs():
 
 def test_get_recommendations_for_drug_HLA_ABACAVIR():
     # Abacavir exists in every base with different recommendation in each
-    assert (
-        sorted(
-            list(
-                get_recommendations_for_drug(
-                    "abacavir",
-                    {
-                        "HLA-B*57:01": {
-                            "factor": "positive",
-                            "cpic_factor": "positive",
-                            "activityscore": None,
-                        }
-                    },
-                ).keys()
-            )
+    assert sorted(
+        list(
+            get_recommendations_for_drug(
+                "abacavir",
+                {
+                    "HLA-B*57:01": {
+                        "factor": "positive",
+                        "cpic_factor": "positive",
+                        "activityscore": None,
+                    }
+                },
+            ).keys()
         )
-        == ["cpic", "dpwg", "fda"]
-    )
+    ) == ["cpic", "dpwg", "fda"]
 
 
 def test_get_recommendation_for_drug():

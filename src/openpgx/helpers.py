@@ -4,9 +4,9 @@ import re
 import tempfile
 import traceback
 import zipfile
-from typing import Any
 from collections import defaultdict
 from os import path
+from typing import Any
 from urllib.request import Request, urlopen
 
 import appdirs
@@ -119,7 +119,7 @@ PHENOTYPE_AND_ALLELE_NORMALIZATIONS_CPIC = {
 PHENOTYPE_AND_ALLELE_NORMALIZATIONS_DPWG_FDA = {}
 
 
-def get_phenoconversion_data_from_recommendations(recommendations: list) -> dict:
+def get_phenoconversion_data_from_recommendations(recommendations: dict) -> dict:
     result = {}
     for recommendations in recommendations.values():
         for recommendation in recommendations:
@@ -128,7 +128,7 @@ def get_phenoconversion_data_from_recommendations(recommendations: list) -> dict
     return result
 
 
-def normalize_hla_gene_and_factor(genename: str, factor: str) -> str:
+def normalize_hla_gene_and_factor(genename: str, factor: str) -> tuple[str, str]:
     if "HLA-" in genename:
         for i in [" positive", " negative"]:
             if i in factor:
@@ -167,7 +167,7 @@ def _key_without_description(recommendation: dict) -> str:
     return ":::".join([f"{a}::{str(b)}" for a, b in r.items()])
 
 
-def format_with_populations(recommendations_by_population: dict) -> str:
+def format_with_populations(recommendations_by_population: dict) -> dict:
     if len(recommendations_by_population) == 1:
         return list(recommendations_by_population.values())[0]
 

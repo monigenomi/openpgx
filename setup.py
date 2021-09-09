@@ -52,12 +52,7 @@ package(
     },
     install_requires=["loguru"],
     extras_require={
-        "dev": [
-            "black==20.8b1",
-            "pre-commit==2.9.2",
-            "pylint==2.6.2",
-            "pytest==6.1.1",
-        ]
+        "dev": ["black==21.8b0", "pre-commit", "pylint", "pytest", "isort==5.9.3"]
     },
     python_requires="~=3.8",
 )

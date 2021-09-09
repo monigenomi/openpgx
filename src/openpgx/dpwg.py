@@ -6,11 +6,11 @@ from os import path
 import bs4
 
 from .helpers import (
-    load_json,
-    is_star,
-    get_phenoconversion_data_from_recommendations,
-    format_with_populations,
     download_to_cache_dir,
+    format_with_populations,
+    get_phenoconversion_data_from_recommendations,
+    is_star,
+    load_json,
 )
 
 
@@ -223,8 +223,7 @@ def get_dpwg_recommendations(url=DPWG_DEFAULT_URL) -> dict:
     cache_dir = download_to_cache_dir(url, "dpwg")
 
     wildcard = path.join(
-        path.dirname(path.realpath(__file__)),
-        f"{cache_dir}/Annotation_of_DPWG_*.json",
+        path.dirname(path.realpath(__file__)), f"{cache_dir}/Annotation_of_DPWG_*.json",
     )
 
     entries = [load_dpwg_entry(filename) for filename in glob.glob(wildcard)]

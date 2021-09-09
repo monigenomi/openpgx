@@ -1,10 +1,13 @@
 repos:
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.9.3
+  - repo: local
     hooks:
       - id: isort
-        args: ["--profile", "black", "--filter-files"]
-  - repo: https://github.com/psf/black
-    rev: 21.8b0
-    hooks:
+        name: isort
+        language: python
+        require_serial: true
+        entry: bash -c 'isort "$@"; git add -u' --
       - id: black
+        name: black
+        language: python
+        require_serial: true
+        entry: bash -c 'black "$@"; git add -u' --
