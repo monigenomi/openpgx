@@ -1,9 +1,10 @@
-# OpenPGx ![build status](https://github.com/monigenomi/openpgx/actions/workflows/ci.yml/badge.svg)
+# OpenPGx [![build](https://github.com/monigenomi/openpgx/workflows/CI/badge.svg)](https://github.com/monigenomi/openpgx/actions) 
 
 OpenPGx is software to convert human's genotype to phenotype and annotate with gene-drug recommendations (for all drugs having recommendations in CPIC, DPWG, or FDA pharmacogenomics databases)
 
 ## Development
 
 ```
-make venv
+pip install -e ."[dev]"
+pytest
 ```
