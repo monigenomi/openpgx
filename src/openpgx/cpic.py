@@ -1,7 +1,6 @@
 import re
-from typing import Any
 from collections import defaultdict
-from typing import Optional
+from typing import Any, Optional
 
 import psycopg2.extras
 from loguru import logger

@@ -1,16 +1,11 @@
 import re
 from collections import defaultdict
-from os import path
 from typing import Optional
 
-from .cpic import get_cpic_recommendations, get_cpic_phenoconversion_data
-from .dpwg import get_dpwg_recommendations, get_dpwg_phenoconversion_data
-from .fda import get_fda_recommendations, get_fda_phenoconversion_data
-from .helpers import (
-    PHENOTYPE_AND_ALLELE_NORMALIZATIONS_CPIC,
-    words_to_sentence,
-    save_json,
-)
+from .cpic import get_cpic_phenoconversion_data, get_cpic_recommendations
+from .dpwg import get_dpwg_phenoconversion_data, get_dpwg_recommendations
+from .fda import get_fda_phenoconversion_data, get_fda_recommendations
+from .helpers import PHENOTYPE_AND_ALLELE_NORMALIZATIONS_CPIC, words_to_sentence
 
 
 def index_recommendations(all_recommendations: list) -> dict:

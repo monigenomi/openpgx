@@ -6,10 +6,10 @@ if __name__ == "__main__":
 
 import argparse
 import json
-from typing import Optional, IO
+from typing import IO, Optional
 
-from .openpgx import get_genes, get_all_recommendations
 from .helpers import save_json
+from .openpgx import get_all_recommendations, get_genes
 
 
 def convert_pgx_input(inputs: list) -> dict:
@@ -31,7 +31,8 @@ class ArgumentParser(argparse.ArgumentParser):
 # recommendations = get_all_recommendations()
 # save_json('recommendations.json', recommendations)
 
-if __name__ == "__main__":
+
+def main():
     parser = ArgumentParser(prog="openpgx")
 
     parser.add_argument(
@@ -51,3 +52,7 @@ if __name__ == "__main__":
     result = get_recommendations(genes)
 
     print(json.dumps(result, indent=2))
+
+
+if __name__ == "__main__":
+    main()
