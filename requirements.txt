@@ -1,2 +1,3 @@
 loguru
 termcolor
+psycopg2
