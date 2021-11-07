@@ -7,6 +7,10 @@ def test_get_all_drugs():
     assert len(drugs) == 139
 
 
+def test_get_all_recommendations():
+    assert get_all_recommendations() == []
+
+
 def test_get_recommendations_for_drug_HLA_ABACAVIR():
     # Abacavir exists in every base with different recommendation in each
     assert (
