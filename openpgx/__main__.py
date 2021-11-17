@@ -1,29 +1,15 @@
-if __name__ == "__main__":
-    from os.path import dirname
-
-    __path__ = [dirname(__file__)]
-    del dirname
-
 import argparse
 import json
 from typing import IO, Optional
 
-from .helpers import save_json
-from .openpgx import get_all_recommendations, get_genes
-
-
-def convert_pgx_input(inputs: list) -> dict:
-    result = {}
-    for item in inputs:
-        result[item["gene"]] = item["genotype"]
-    return result
+from . import get_recommendations
 
 
 class ArgumentParser(argparse.ArgumentParser):
-    def print_help(self, file: Optional[IO[str]] = ...) -> None:
+    def print_help(self, _: Optional[IO[str]] = ...) -> None:
         print(
             """
-        Gets data about genotype from CPIC database.
+        Calculates pharmacogenomic recommendations for each supported drug
         """
         )
 
@@ -47,9 +33,8 @@ def main():
         with open(path) as f:
             return json.load(f)
 
-    input = convert_pgx_input(load_json(args["input"]))
-    genes = get_genes(input)
-    result = get_recommendations(genes)
+    input = load_json(args["input"])
+    result = get_recommendations(input)
 
     print(json.dumps(result, indent=2))
 

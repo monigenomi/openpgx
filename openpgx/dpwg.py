@@ -22,45 +22,21 @@ def extract_drug_name(dpwg_filename: str) -> str:
     return dpwg_filename.split("_and_")[0].split("_")[-1]
 
 
-def detect_engine():
-    try:
-        import lxml
-    except ImportError:
-        engine = "html.parser"
-    else:
-        engine = "lxml"
-    return engine
-
-
-class Converter:
-    def __init__(self, **kwargs):
-        engine = kwargs.get("engine")
-        if engine is None:
-            self.engine = detect_engine()
-        else:
-            self.engine = engine
-        self.params = kwargs
-
-    def convert(self, html_doc):
-        soup = bs4.BeautifulSoup(html_doc, self.engine)
-        output = []
-        # TODO do not miss new line \n
-        for table_num, table in enumerate(soup.find_all("table"), start=1):
-            for tr in table.find_all("tr"):
-                row = ["".join(cell.strings) for cell in tr.find_all(["td", "th"])]
-                output.append([table_num, *row])
-
-        return output
-
-
 def table_from_html(html_text: str) -> list:
-    c = Converter()
-    return c.convert(html_text)
+    soup = bs4.BeautifulSoup(html_text, "html.parser")
+    output = []
+    # TODO do not miss new line \n
+    for table_num, table in enumerate(soup.find_all("table"), start=1):
+        for tr in table.find_all("tr"):
+            row = ["".join(cell.strings) for cell in tr.find_all(["td", "th"])]
+            output.append([table_num, *row])
+
+    return output
 
 
 def tables_to_dicts(tables: list):
     if len(tables) < 1:
-        return tables
+        return {}
 
     temporary = {}
     result = {}
@@ -267,7 +243,7 @@ def get_dpwg_recommendations(url=DPWG_DEFAULT_URL) -> dict:
 
             recommendations_by_drug_and_population[entry["drug"]][
                 entry["population"]
-            ] = recommendation
+            ].append(recommendation)
 
     result = defaultdict(list)
     for (
@@ -277,6 +253,7 @@ def get_dpwg_recommendations(url=DPWG_DEFAULT_URL) -> dict:
         full_recommendation = format_with_populations(recommendations_by_population)
         result[drug].append(full_recommendation)
 
+    print(result)
     return dict(result)
 
 

@@ -1,3 +1,5 @@
 loguru
 termcolor
 psycopg2
+bs4
+appdirs

@@ -6,7 +6,7 @@ import traceback
 import zipfile
 from collections import defaultdict
 from os import path
-from typing import Any
+from typing import Any, Tuple
 from urllib.request import Request, urlopen
 
 import appdirs
@@ -128,7 +128,7 @@ def get_phenoconversion_data_from_recommendations(recommendations: dict) -> dict
     return result
 
 
-def normalize_hla_gene_and_factor(genename: str, factor: str) -> tuple[str, str]:
+def normalize_hla_gene_and_factor(genename: str, factor: str) -> Tuple[str, str]:
     if "HLA-" in genename:
         for i in [" positive", " negative"]:
             if i in factor:

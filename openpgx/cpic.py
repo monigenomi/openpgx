@@ -2,16 +2,15 @@ import re
 from collections import defaultdict
 from typing import Any, Optional
 
-import psycopg2.extras
 from loguru import logger
 
 from .helpers import normalize_hla_gene_and_factor
 
-conn = psycopg2.connect(
-    "postgresql://monika@localhost/cpicv1.8?options=-c%20search_path%3Dcpic",
-    cursor_factory=psycopg2.extras.DictCursor,
-)
-
+# conn = psycopg2.connect(
+#     "postgresql://monika@localhost/cpicv1.8?options=-c%20search_path%3Dcpic",
+#     cursor_factory=psycopg2.extras.DictCursor,
+# )
+#
 data_queries = {
     "allele": "SELECT id, genesymbol, name, functionalstatus, definitionid, clinicalfunctionalstatus, activityvalue, citations FROM "
     "allele",
@@ -310,6 +309,8 @@ CLASSIFICATION_TO_STRENGTH = {
 
 
 def get_cpic_recommendations() -> dict:
+    return {}
+
     result = defaultdict(list)
 
     for recommendation in fetch_all("recommendation"):
@@ -346,6 +347,7 @@ def get_genotype_index(genesymbol: str, diplotype: str) -> str:
 
 def get_cpic_phenoconversion_data(recommendations):
     result = {}
+    return result
     for gene_result_diplotype in fetch_all("gene_result_diplotype"):
         gene_result_lookup = find(
             "gene_result_lookup", "id", gene_result_diplotype["functionphenotypeid"]
@@ -368,4 +370,8 @@ def get_cpic_phenoconversion_data(recommendations):
     return result
 
 
-# weź funkcje≤ która będzie przyjmowała input od użytkownika i zwracała fenotypy
+if __file__ == "__main__":
+    file = download_to_cache_dir("https://github.com/cpicpgx/cpic-data/releases/download/v1.8/cpic_db_dump-v1.8_inserts.sql.gz", "cpic")
+    print(file)
+
+

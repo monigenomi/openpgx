@@ -1,0 +1,27 @@
+{
+  "mode": "horizontal",
+  "configurations": {
+    "Python: pytest": {
+      "adapter": "debugpy",
+      "configuration": {
+        "name": "OpenPGX: Launch",
+        "type": "python",
+        "request": "launch",
+        "cwd": "${workspaceRoot}",
+        "python": "${workspaceRoot}/venv/bin/python",
+        "stopOnEntry": false,
+        "console": "externalTerminal",
+        "debugOptions": [],
+        "module": "pytest",
+				"args": ["${relativeFile}"]
+      },
+      "breakpoints": {
+        "exception": {
+          "caught": "N",
+          "uncaught": "Y",
+          "raised": "N"
+        }
+      }
+    }
+	}
+}
