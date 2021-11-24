@@ -5,6 +5,8 @@ OpenPGx is software to convert human's genotype to phenotype and annotate with g
 ## Development
 
 ```
-pip install -e ."[dev]"
+python3 -m venv
+source venv/bin/activate
+pip install -e .[dev]
 pytest
 ```
