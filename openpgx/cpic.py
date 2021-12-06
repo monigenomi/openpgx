@@ -335,12 +335,13 @@ def get_cpic_phenoconversion_data():
     pass
 
 def get_records(cached_sql_gz):
-    if os.path.exists("./cpicdb.pkl"):
-        with open("./cpicdb.pkl", "rb") as cpicdb:
+    cached_file_path = cached_sql_gz + ".pkl"
+    if os.path.exists(cached_file_path):
+        with open(cached_file_path, "rb") as cpicdb:
             return pickle.load(cpicdb)
     
     db = CpicDB(cached_sql_gz)
-    with open("./cpicdb.pkl", "wb") as cpicdb:
+    with open(cached_file_path, "wb") as cpicdb:
         pickle.dump(db, cpicdb)
     return db
 
