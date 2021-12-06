@@ -253,7 +253,6 @@ def get_dpwg_recommendations(url=DPWG_DEFAULT_URL) -> dict:
         full_recommendation = format_with_populations(recommendations_by_population)
         result[drug].append(full_recommendation)
 
-    print(result)
     return dict(result)
 
 

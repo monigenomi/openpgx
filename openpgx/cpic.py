@@ -1,43 +1,43 @@
-import re
 from collections import defaultdict
+import gzip
+import re
+import sys
+import json
 from typing import Any, Optional
 
 from loguru import logger
 
-from .helpers import normalize_hla_gene_and_factor
+from .helpers import (
+    download_to_cache_dir,
+    normalize_hla_gene_and_factor,
+    sql_to_data,
+    yield_inserts_from_file,
+)
 
-# conn = psycopg2.connect(
-#     "postgresql://monika@localhost/cpicv1.8?options=-c%20search_path%3Dcpic",
-#     cursor_factory=psycopg2.extras.DictCursor,
-# )
-#
-data_queries = {
-    "allele": "SELECT id, genesymbol, name, functionalstatus, definitionid, clinicalfunctionalstatus, activityvalue, citations FROM "
-    "allele",
-    "allele_definition": "SELECT * FROM allele_definition",
-    "gene": "SELECT * FROM gene",
-    "pair": "SELECT genesymbol, pairid, drugid, guidelineid, cpiclevel, pgkbcalevel, pgxtesting, citations FROM pair",
-    "guideline": "SELECT * FROM guideline",
-    "drug": "SELECT drugid, name, pharmgkbid, rxnormid, drugbankid, atcid, guidelineid FROM drug",
-    "publication": "SELECT * FROM publication",
-    "recommendation": "SELECT * FROM recommendation",
-    "gene_result_diplotype": "SELECT * FROM gene_result_diplotype",
-    "gene_result_lookup": "SElECT * FROM gene_result_lookup",
-    "test_alert": "SELECT * FROM test_alert",
-    "gene_result": "SELECT * FROM gene_result",
+CPIC_DEFAULT_URL = (
+    "https://github.com/cpicpgx/cpic-data/releases/download/v1.10/cpic_db_dump-v1.10_inserts.sql.gz"
+)
+
+data_tables = [
+    'allele',
+    'allele_definition',
+    'gene',
+    'pair',
+    'guideline',
+    'drug',
+    'publication',
+    'recommendation',
+    'gene_result_diplotype',
+    'gene_result_lookup',
+    'test_alert',
+    'gene_result'
+]
+
+data_keys = {
+    "drug": "drugid",
+    "pair": "pairid",
+    "gene": "symbol"
 }
-
-data_keys = {"drug": "drugid", "pair": "pairid", "gene": "symbol"}
-
-DATA = {}
-INDEXES = {}
-
-
-def fetch(query: str) -> list:
-    with conn.cursor() as curs:
-        curs.execute(query)
-        return [dict(result) for result in curs.fetchall()]
-
 
 def get_index(columns) -> Any:
     if callable(columns):
@@ -49,10 +49,10 @@ def get_index(columns) -> Any:
     return lambda item: item[columns]
 
 
-def create_index(data: list, columns: Any) -> dict:
+def create_index(rows: list, columns: Any) -> dict:
     index_fn = get_index(columns)
     index = defaultdict(list)
-    for item in data:
+    for item in rows:
         key_or_keys = index_fn(item)
         if type(key_or_keys) == list:
             for key in key_or_keys:
@@ -63,12 +63,57 @@ def create_index(data: list, columns: Any) -> dict:
     return dict(index)
 
 
-def normalize(table: str, record: Any) -> Any:
+class CpicDB:
+    def __init__(self, sql_gz_path):
+        # keys are table names, values are lists of records in them
+        self.data = defaultdict(list)
+
+        with gzip.open(sql_gz_path, 'rt') as file:
+            for query in yield_inserts_from_file(file):
+                table_name, row = sql_to_data(query)
+                if table_name in data_tables:
+                    normalized_row = normalize(table_name, row)
+                    if normalized_row is not None:
+                        self.data[table_name].append(normalized_row)
+
+        self.indexes = {}
+
+    def all(self, table: str):
+        return self.data[table]
+
+    def select(self, table: str, columns: Any, values: Any) -> list:
+        if type(values) != list:
+            values = [values]
+
+        rows = self.data[table]
+
+        index_name = (table, columns)
+
+        if hasattr(columns, "__name__"):
+            index_name = (table, columns.__name__)
+
+        if index_name not in self.indexes:
+            self.indexes[index_name] = create_index(rows, columns)
+
+        index = self.indexes[index_name]
+
+        results = {}
+        for value in values:
+            if value in index:
+                for record in index[value]:
+                    key_fn = get_index(data_keys.get(table, "id"))
+                    results[key_fn(record)] = record
+
+        return list(results.values())
+
+# normalizes row from cpic database, given table name and row
+def normalize(table: str, record: dict) -> Optional[dict]:
     if table == "recommendation":
         if record["drugrecommendation"] == "No recommendation":
             return None
 
-        for key in list(record["lookupkey"].keys()):
+        parsed_lookupkey = json.loads(record["lookupkey"])
+        for key in list(parsed_lookupkey.keys()):
             match = re.match(r"^No (.+) result$", record["lookupkey"][key])
             if match:
                 record["lookupkey"][key] = match[1] + " n/a"
@@ -76,51 +121,13 @@ def normalize(table: str, record: Any) -> Any:
     return record
 
 
-def fetch_all(table):
-    if table not in DATA:
-        data = []
-        for row in fetch(data_queries[table]):
-            normalized_row = normalize(table, row)
-            if normalized_row:
-                data.append(normalized_row)
-        DATA[table] = data
-
-    return DATA[table]
 
 
-def select(table: str, columns: Any, values: Any) -> list:
-    if type(values) != list:
-        values = [values]
-
-    rows = fetch_all(table)
-
-    index_name = (table, columns)
-
-    if hasattr(columns, "__name__"):
-        index_name = (table, columns.__name__)
-
-    if index_name not in INDEXES:
-        INDEXES[index_name] = create_index(rows, columns)
-
-    index = INDEXES[index_name]
-
-    results = {}
-    for value in values:
-        if value in index:
-            for record in index[value]:
-                key_fn = get_index(data_keys.get(table, "id"))
-                results[key_fn(record)] = record
-
-    return list(results.values())
-
-
-def find(table: str, columns: Any, values: Any) -> Optional[dict]:
+def find(table: str, columns: Any, values: Any) -> dict:
     results = select(table, columns, values)
 
-    if len(results) > 0:
-        return results[0]
+    return results[0]
 
-    return results
 
 
 def by_gene_and_diplotype(item):
@@ -290,7 +297,7 @@ def get_url_for_publication(publication):
         return "https://pubmed.ncbi.nlm.nih.gov/" + publication["pmid"] + "/"
 
 
-def get_factors_for_recommendation(recommendation) -> list:
+def get_factors_for_recommendation(recommendation) -> dict:
     factors = {}
     for gene, factor in recommendation["lookupkey"].items():
         gene, factor = normalize_cpic_factor(gene, factor)
@@ -308,18 +315,32 @@ CLASSIFICATION_TO_STRENGTH = {
 }
 
 
-def get_cpic_recommendations() -> dict:
-    return {}
+def get_genotype_index(genesymbol: str, diplotype: str) -> str:
+    if "HLA-" in genesymbol:
+        if " positive" in diplotype:
+            return genesymbol + ":positive"
+        if " negative" in diplotype:
+            return genesymbol + ":negative"
 
+    return genesymbol + ":" + "/".join(sorted(diplotype.split("/")))
+
+def get_cpic_phenoconversion_data():
+    pass
+
+def get_cpic_recommendations(url: str = CPIC_DEFAULT_URL) -> dict:
     result = defaultdict(list)
 
-    for recommendation in fetch_all("recommendation"):
+    cached_sql_gz = download_to_cache_dir(url, "cpic")
+
+    db = CpicDB(cached_sql_gz)
+
+    for recommendation in db.all("recommendation"):
         # TODO: check all populations values
         # if recommendation["population"] not in ["general", "adults"]:
         #     continue
 
-        drug = select("drug", "drugid", recommendation["drugid"])[0]
-        guideline = select("guideline", "id", recommendation["guidelineid"])[0]
+        drug = db.select("drug", "drugid", recommendation["drugid"])[0]
+        guideline = db.select("guideline", "id", recommendation["guidelineid"])[0]
 
         result[drug["name"]].append(
             {
@@ -333,45 +354,11 @@ def get_cpic_recommendations() -> dict:
             }
         )
 
-    return dict(result)
-
-
-def get_genotype_index(genesymbol: str, diplotype: str) -> str:
-    sorted_diplotype = "/".join(sorted(diplotype.split("/")))
-    if "HLA-" in genesymbol:
-        for i in [" positive", " negative"]:
-            if i in diplotype:
-                return genesymbol + ":" + i[1:]
-    return genesymbol + ":" + sorted_diplotype
-
-
-def get_cpic_phenoconversion_data(recommendations):
-    result = {}
-    return result
-    for gene_result_diplotype in fetch_all("gene_result_diplotype"):
-        gene_result_lookup = find(
-            "gene_result_lookup", "id", gene_result_diplotype["functionphenotypeid"]
-        )
-        gene_result = find("gene_result", "id", gene_result_lookup["phenotypeid"])
-
-        activity_score = normalize_activityscore(gene_result["activityscore"])
-
-        gene_name, phenotype = normalize_hla_gene_and_factor(
-            gene_result["genesymbol"], gene_result["result"]
-        )
-
-        index = get_genotype_index(gene_name, gene_result_diplotype["diplotype"])
-
-        result[index] = [
-            phenotype,
-            float(activity_score[3:]) if activity_score else None,
-        ]
+        print(result)
+        sys.exit(0)
 
     return result
 
 
-if __file__ == "__main__":
-    file = download_to_cache_dir("https://github.com/cpicpgx/cpic-data/releases/download/v1.8/cpic_db_dump-v1.8_inserts.sql.gz", "cpic")
-    print(file)
-
-
+def cpic_main():
+    return get_cpic_recommendations()

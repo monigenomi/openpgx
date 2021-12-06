@@ -8,6 +8,9 @@ from collections import defaultdict
 from os import path
 from typing import Any, Tuple
 from urllib.request import Request, urlopen
+import pglast
+import json
+from collections import defaultdict
 
 import appdirs
 from loguru import logger
@@ -130,11 +133,14 @@ def get_phenoconversion_data_from_recommendations(recommendations: dict) -> dict
 
 def normalize_hla_gene_and_factor(genename: str, factor: str) -> Tuple[str, str]:
     if "HLA-" in genename:
-        for i in [" positive", " negative"]:
-            if i in factor:
-                if "*" not in genename:
-                    genename = genename + factor.replace(i, "")
-                factor = i[1:]
+        if " positive" in factor:
+            if "*" not in genename:
+                genename = genename + factor.replace(" positive", "")
+            factor = "positive"
+        if " negative" in factor:
+            if "*" not in genename:
+                genename = genename + factor.replace(" negative", "")
+            factor = "negative"
 
     return genename, factor
 
@@ -219,3 +225,40 @@ def download_to_cache_dir(url, subdir_name):
         download_path = path.join(cache_dir, path.basename(url))
         download_url(url, download_path)
         return download_path
+
+
+def const_to_val(const):
+    if type(const) == pglast.ast.TypeCast:
+        return {
+            't': True,
+            'f': False
+        }[const.arg.val.val]
+
+    value = const.val.val
+    if type(value) == str and value[0:2] == '{"':
+        if value[0:1] == '{"':
+            value = json.loads(value)
+        elif value[0] == "{" and "," in value:
+            return None
+
+    return value
+
+
+def sql_to_data(sql):
+    parsed = pglast.parser.parse_sql(sql)
+    names = [col.name for col in parsed[0].stmt.cols]
+    values = [const_to_val(value) for value in parsed[0].stmt.selectStmt.valuesLists[0]]
+    return parsed[0].stmt.relation.relname, dict(zip(names, values))
+
+
+def yield_inserts_from_file(file):
+    query = ""
+    for line in file.readlines():
+        if len(query) > 0:
+            query += line
+        elif "INSERT INTO" in line:
+            query = line
+
+        if len(query) > 1 and query[-2] == ";":
+            yield query
+            query = ""

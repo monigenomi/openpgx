@@ -3,6 +3,7 @@ import json
 from typing import IO, Optional
 
 from . import get_recommendations
+from .cpic import cpic_main
 
 
 class ArgumentParser(argparse.ArgumentParser):
@@ -40,4 +41,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    cpic_main()
