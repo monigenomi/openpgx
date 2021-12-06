@@ -1,7 +1,8 @@
+import os
 from collections import defaultdict
 import gzip
 import re
-import sys
+import pickle
 import json
 from typing import Any, Optional
 
@@ -333,13 +334,22 @@ def get_genotype_index(genesymbol: str, diplotype: str) -> str:
 def get_cpic_phenoconversion_data():
     pass
 
+def get_records(cached_sql_gz):
+    if os.path.exists("./cpicdb.pkl"):
+        with open("./cpicdb.pkl", "rb") as cpicdb:
+            return pickle.load(cpicdb)
+    
+    db = CpicDB(cached_sql_gz)
+    with open("./cpicdb.pkl", "wb") as cpicdb:
+        pickle.dump(db, cpicdb)
+    return db
 
 def get_cpic_recommendations(url: str = CPIC_DEFAULT_URL) -> dict:
     result = defaultdict(list)
 
     cached_sql_gz = download_to_cache_dir(url, "cpic")
 
-    db = CpicDB(cached_sql_gz)
+    db = get_records(cached_sql_gz)
 
     for recommendation in db.all("recommendation"):
         # TODO: check all populations values
