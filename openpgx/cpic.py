@@ -39,6 +39,7 @@ data_keys = {
     "gene": "symbol"
 }
 
+
 def get_index(columns) -> Any:
     if callable(columns):
         return columns
@@ -112,11 +113,16 @@ def normalize(table: str, record: dict) -> Optional[dict]:
         if record["drugrecommendation"] == "No recommendation":
             return None
 
-        parsed_lookupkey = json.loads(record["lookupkey"])
-        for key in list(parsed_lookupkey.keys()):
-            match = re.match(r"^No (.+) result$", record["lookupkey"][key])
-            if match:
-                record["lookupkey"][key] = match[1] + " n/a"
+        if record["lookupkey"]:
+            parsed_lookupkey = json.loads(record["lookupkey"])
+            for key in list(parsed_lookupkey.keys()):
+                match = re.match(r"^No (.+) result$", parsed_lookupkey[key])
+                if match:
+                    parsed_lookupkey[key] = match[1] + " n/a"
+    
+            record["lookupkey"] = parsed_lookupkey
+        else:
+            record["lookupkey"] = {}
 
     return record
 
@@ -327,6 +333,7 @@ def get_genotype_index(genesymbol: str, diplotype: str) -> str:
 def get_cpic_phenoconversion_data():
     pass
 
+
 def get_cpic_recommendations(url: str = CPIC_DEFAULT_URL) -> dict:
     result = defaultdict(list)
 
@@ -353,9 +360,6 @@ def get_cpic_recommendations(url: str = CPIC_DEFAULT_URL) -> dict:
                 # "population": recommendation["population"]
             }
         )
-
-        print(result)
-        sys.exit(0)
 
     return result
 
