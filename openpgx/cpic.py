@@ -1,9 +1,9 @@
-import os
-from collections import defaultdict
 import gzip
-import re
-import pickle
 import json
+import os
+import pickle
+import re
+from collections import defaultdict
 from typing import Any, Optional
 
 from loguru import logger
@@ -40,14 +40,17 @@ data_keys = {
     "gene": "symbol"
 }
 
+DATA = None
+INDEXES = None
+
 
 def get_index(columns) -> Any:
     if callable(columns):
         return columns
-
+    
     if type(columns) == tuple:
         return lambda item: tuple([item[column] for column in columns])
-
+    
     return lambda item: item[columns]
 
 
@@ -61,80 +64,78 @@ def create_index(rows: list, columns: Any) -> dict:
                 index[key].append(item)
         else:
             index[key_or_keys].append(item)
-
+    
     return dict(index)
 
 
-class CpicDB:
-    def __init__(self, sql_gz_path):
-        # keys are table names, values are lists of records in them
-        self.data = defaultdict(list)
+def load_cpic_database(sql_gz_path):
+    global DATA, INDEXES
+    
+    # keys are table names, values are lists of records in them
+    DATA = defaultdict(list)
+    
+    with gzip.open(sql_gz_path, 'rt') as file:
+        for query in yield_inserts_from_file(file):
+            table_name, row = sql_to_data(query)
+            if table_name in data_tables:
+                normalized_row = normalize(table_name, row)
+                if normalized_row is not None:
+                    DATA[table_name].append(normalized_row)
+    
+    INDEXES = {}
+    DATA = dict(DATA)
 
-        with gzip.open(sql_gz_path, 'rt') as file:
-            for query in yield_inserts_from_file(file):
-                table_name, row = sql_to_data(query)
-                if table_name in data_tables:
-                    normalized_row = normalize(table_name, row)
-                    if normalized_row is not None:
-                        self.data[table_name].append(normalized_row)
 
-        self.indexes = {}
+def select(table: str, columns: Any, values: Any) -> list:
+    if type(values) != list:
+        values = [values]
+    
+    rows = DATA[table]
+    
+    index_name = (table, columns)
+    
+    if hasattr(columns, "__name__"):
+        index_name = (table, columns.__name__)
+    
+    if index_name not in INDEXES:
+        INDEXES[index_name] = create_index(rows, columns)
+    
+    index = INDEXES[index_name]
+    
+    results = {}
+    for value in values:
+        if value in index:
+            for record in index[value]:
+                key_fn = get_index(data_keys.get(table, "id"))
+                results[key_fn(record)] = record
+    
+    return list(results.values())
 
-    def all(self, table: str):
-        return self.data[table]
-
-    def select(self, table: str, columns: Any, values: Any) -> list:
-        if type(values) != list:
-            values = [values]
-
-        rows = self.data[table]
-
-        index_name = (table, columns)
-
-        if hasattr(columns, "__name__"):
-            index_name = (table, columns.__name__)
-
-        if index_name not in self.indexes:
-            self.indexes[index_name] = create_index(rows, columns)
-
-        index = self.indexes[index_name]
-
-        results = {}
-        for value in values:
-            if value in index:
-                for record in index[value]:
-                    key_fn = get_index(data_keys.get(table, "id"))
-                    results[key_fn(record)] = record
-
-        return list(results.values())
 
 # normalizes row from cpic database, given table name and row
 def normalize(table: str, record: dict) -> Optional[dict]:
     if table == "recommendation":
         if record["drugrecommendation"] == "No recommendation":
             return None
-
+        
         if record["lookupkey"]:
             parsed_lookupkey = json.loads(record["lookupkey"])
             for key in list(parsed_lookupkey.keys()):
                 match = re.match(r"^No (.+) result$", parsed_lookupkey[key])
                 if match:
                     parsed_lookupkey[key] = match[1] + " n/a"
-    
+            
             record["lookupkey"] = parsed_lookupkey
         else:
             record["lookupkey"] = {}
-
+    
     return record
-
-
 
 
 def find(table: str, columns: Any, values: Any) -> dict:
     results = select(table, columns, values)
-
+    
     return results[0]
-
 
 
 def by_gene_and_diplotype(item):
@@ -160,13 +161,13 @@ def normalize_activityscore(activityscore):
 def normalize_cpic_factor(genename: str, factor: str) -> tuple:
     if re.match(r"≥?\d+(\.\d+)?", factor):
         return genename, normalize_activityscore(factor)
-
+    
     if re.match(r"No (.*?) Result|No Result|n/a", factor):
         return genename, None
-
+    
     if "HLA-" in genename:
         genename, factor = normalize_hla_gene_and_factor(genename, factor)
-
+    
     return genename, factor
 
 
@@ -182,17 +183,17 @@ def get_alleles(gene: str, genotype: list) -> list:
 
 def get_cpic_info(name: str, genotype: list) -> Optional[dict]:
     cpic_genes = select("gene", "symbol", name)
-
+    
     if len(cpic_genes) == 0:
         return None
-
+    
     gene = cpic_genes[0]
-
+    
     alleles = []
-
+    
     if pass_diplotype(name, genotype):
         alleles = get_alleles(name, genotype)
-
+    
     if len(alleles) == 0:
         logger.warning(
             "Gene found in CPIC but none of the alleles were",
@@ -200,26 +201,26 @@ def get_cpic_info(name: str, genotype: list) -> Optional[dict]:
             genotype=genotype,
         )
         return None
-
+    
     activity_score = normalize_activityscore(
         get_activity_score(name, "/".join(genotype))
     )
-
+    
     phenotype = get_normalized_phenotype(name, genotype)
-
+    
     if not phenotype:
         logger.error(
             "Phenotype for genotype does not exist in CPIC database",
             genotype=genotype,
             gene=name,
         )
-
+    
     gene_result = select(
         "gene_result",
         ("genesymbol", "result"),
         (gene, phenotype),
     )[0]
-
+    
     return {
         "alleles": alleles,
         "activityscore": activity_score,
@@ -263,12 +264,12 @@ def get_allele_info(gene: str, allele_name: str) -> Optional[dict]:
     # TODO: Do not treat them specially
     if "positive" in allele_name or "negative" in allele_name:
         queried_allele_name = allele_name.split(" ")[0]
-
+    
     allele = get_allele_by_haplotype(gene, queried_allele_name)
-
+    
     if allele:
         allele_definition = select("allele_definition", "id", allele["definitionid"])[0]
-
+        
         result = {
             "gene": allele["genesymbol"],
             "name": allele["name"],
@@ -286,10 +287,10 @@ def get_allele_info(gene: str, allele_name: str) -> Optional[dict]:
             allele=allele_name,
         )
         return None
-
+    
     if "HLA-" in gene:
         result["variant"] = allele_name.split(" ")[1]
-
+    
     return result
 
 
@@ -328,38 +329,43 @@ def get_genotype_index(genesymbol: str, diplotype: str) -> str:
             return genesymbol + ":positive"
         if " negative" in diplotype:
             return genesymbol + ":negative"
-
+    
     return genesymbol + ":" + "/".join(sorted(diplotype.split("/")))
+
 
 def get_cpic_phenoconversion_data():
     pass
 
-def get_records_to_ceched_dir(cached_sql_gz):
+
+def load_cpic_database_cached(cached_sql_gz: str):
+    global DATA, INDEXES
     cached_file_path = cached_sql_gz + ".pkl"
     if os.path.exists(cached_file_path):
         with open(cached_file_path, "rb") as cpicdb:
-            return pickle.load(cpicdb)
+            DATA = pickle.load(cpicdb)
+            INDEXES = {}
     
-    db = CpicDB(cached_sql_gz)
+    load_cpic_database(cached_sql_gz)
+    
     with open(cached_file_path, "wb") as cpicdb:
-        pickle.dump(db, cpicdb)
-    return db
+        pickle.dump(DATA, cpicdb)
 
-def get_cpic_raw_data(url: str = CPIC_DEFAULT_URL) -> dict:
+
+def get_cpic_recommendations(url: str = CPIC_DEFAULT_URL) -> dict:
     result = defaultdict(list)
-
+    
     cached_sql_gz = download_to_cache_dir(url, "cpic")
-
-    db = get_records_to_ceched_dir(cached_sql_gz)
-
-    for recommendation in db.all("recommendation"):
+    
+    load_cpic_database_cached(cached_sql_gz)
+    
+    for recommendation in DATA["recommendation"]:
         # TODO: check all populations values
         # if recommendation["population"] not in ["general", "adults"]:
         #     continue
-
-        drug = db.select("drug", "drugid", recommendation["drugid"])[0]
-        guideline = db.select("guideline", "id", recommendation["guidelineid"])[0]
-
+        
+        drug = select("drug", "drugid", recommendation["drugid"])[0]
+        guideline = select("guideline", "id", recommendation["guidelineid"])[0]
+        
         result[drug["name"]].append(
             {
                 "factors": get_factors_for_recommendation(recommendation),
@@ -371,9 +377,9 @@ def get_cpic_raw_data(url: str = CPIC_DEFAULT_URL) -> dict:
                 # "population": recommendation["population"]
             }
         )
-
+    
     return result
 
 
 def cpic_main():
-    return get_cpic_raw_data()
+    return get_cpic_recommendations()

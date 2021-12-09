@@ -3,7 +3,7 @@
 from openpgx.cpic import *
 from openpgx.helpers import *
 
-CPIC_RECOMMENDATIONS = get_cpic_raw_data()
+CPIC_RECOMMENDATIONS = get_cpic_recommendations()
 
 
 def test_normalize_activityscore():
@@ -41,7 +41,7 @@ def test_get_factors_for_recommendation():
     assert result == {"HLA-B*57:01": "negative"}
 
 
-def test_get_cpic_raw_data():
+def test_get_cpic_recommendations():
     assert CPIC_RECOMMENDATIONS["rasburicase"] == [
         {
             "factors": {"G6PD": "Normal"},

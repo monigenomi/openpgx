@@ -2,7 +2,7 @@ import re
 from collections import defaultdict
 from typing import Optional
 
-from .cpic import get_cpic_phenoconversion_data, get_cpic_raw_data, is_haplo_or_diplo
+from .cpic import get_cpic_phenoconversion_data, get_cpic_recommendations, is_haplo_or_diplo
 from .dpwg import get_dpwg_phenoconversion_data, get_dpwg_recommendations
 from .fda import get_fda_phenoconversion_data, get_fda_recommendations
 from .helpers import PHENOTYPE_AND_ALLELE_NORMALIZATIONS_CPIC, words_to_sentence
@@ -22,7 +22,7 @@ RECOMMENDATIONS = {}
 
 def get_all_recommendations():
     if len(RECOMMENDATIONS) == 0:
-        RECOMMENDATIONS["cpic"] = get_cpic_raw_data()
+        RECOMMENDATIONS["cpic"] = get_cpic_recommendations()
         RECOMMENDATIONS["fda"] = get_fda_recommendations()
         RECOMMENDATIONS["dpwg"] = get_dpwg_recommendations()
     return RECOMMENDATIONS
@@ -271,8 +271,8 @@ def get_recommendations_for_drug(drug: str, factors: dict) -> dict:
     # TODO: tell user that some factor needs to be provided to select single recommendation:
     # for example: recommendation is for 2 genes and second needs to be provided
 
-    # wypisać dla każdego leku jakie faktory są potrzebne żeby zrobić rekomendację
-    # "nie znaleziono rekomendacji ale są możliwe do znalezienia jeżeli przetestuesz ten gen, ten gen i podasz populację
+    # TODO: tell for each drug what factors are needed to give recommendation one recommendation
+    # e.g. recommendation not found, but there is one if you input this gene and/or population
 
     return result
 
