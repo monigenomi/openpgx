@@ -334,7 +334,7 @@ def get_genotype_index(genesymbol: str, diplotype: str) -> str:
 def get_cpic_phenoconversion_data():
     pass
 
-def get_records(cached_sql_gz):
+def get_records_to_ceched_dir(cached_sql_gz):
     cached_file_path = cached_sql_gz + ".pkl"
     if os.path.exists(cached_file_path):
         with open(cached_file_path, "rb") as cpicdb:
@@ -345,12 +345,12 @@ def get_records(cached_sql_gz):
         pickle.dump(db, cpicdb)
     return db
 
-def get_cpic_recommendations(url: str = CPIC_DEFAULT_URL) -> dict:
+def get_cpic_raw_data(url: str = CPIC_DEFAULT_URL) -> dict:
     result = defaultdict(list)
 
     cached_sql_gz = download_to_cache_dir(url, "cpic")
 
-    db = get_records(cached_sql_gz)
+    db = get_records_to_ceched_dir(cached_sql_gz)
 
     for recommendation in db.all("recommendation"):
         # TODO: check all populations values
@@ -376,4 +376,4 @@ def get_cpic_recommendations(url: str = CPIC_DEFAULT_URL) -> dict:
 
 
 def cpic_main():
-    return get_cpic_recommendations()
+    return get_cpic_raw_data()

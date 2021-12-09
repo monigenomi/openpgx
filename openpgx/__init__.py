@@ -2,7 +2,7 @@ import re
 from collections import defaultdict
 from typing import Optional
 
-from .cpic import get_cpic_phenoconversion_data, get_cpic_recommendations, is_haplo_or_diplo
+from .cpic import get_cpic_phenoconversion_data, get_cpic_raw_data, is_haplo_or_diplo
 from .dpwg import get_dpwg_phenoconversion_data, get_dpwg_recommendations
 from .fda import get_fda_phenoconversion_data, get_fda_recommendations
 from .helpers import PHENOTYPE_AND_ALLELE_NORMALIZATIONS_CPIC, words_to_sentence
@@ -22,7 +22,7 @@ RECOMMENDATIONS = {}
 
 def get_all_recommendations():
     if len(RECOMMENDATIONS) == 0:
-        RECOMMENDATIONS["cpic"] = get_cpic_recommendations()
+        RECOMMENDATIONS["cpic"] = get_cpic_raw_data()
         RECOMMENDATIONS["fda"] = get_fda_recommendations()
         RECOMMENDATIONS["dpwg"] = get_dpwg_recommendations()
     return RECOMMENDATIONS
