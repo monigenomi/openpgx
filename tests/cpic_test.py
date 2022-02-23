@@ -100,8 +100,8 @@ def test_check_lookup_is_valid():
 
 
 # TODO: what happens if factors: {gene1: None, gene2: Ultrarapid metabolizer} - None is when gene was not provided
-def test_phenoconversion():
-    result = get_cpic_phenoconversion_data([])
+def test_phenotyping():
+    result = get_cpic_phenotyping_data([])
 
     assert result != {}
     assert result["CYP2D6:*1/*1"] == ["Normal Metabolizer", 2.0]
@@ -112,3 +112,4 @@ def test_normalize_cpic_factor():
     assert normalize_cpic_factor("HLA-A", "No *12 Result") == ("HLA-A", None)
     assert normalize_cpic_factor("AAA", "No Result") == ("AAA", None)
     assert normalize_cpic_factor("FOO", "n/a") == ("FOO", None)
+

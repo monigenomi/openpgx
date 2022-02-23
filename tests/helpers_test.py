@@ -24,9 +24,9 @@ def test_index_table_by_something():
     assert result == expected
 
 
-def test_get_phenoconversion_data_from_recommendations():
+def test_get_phenotyping_data_from_recommendations():
     assert (
-        len(get_phenoconversion_data_from_recommendations(get_dpwg_recommendations()))
+        len(get_normalizations(get_dpwg_recommendations()))
         > 0
     )
 
@@ -86,7 +86,7 @@ def test_simple_sql_parse():
             {'chr': 'chrM',
              'chromosequenceid': 'NC_012920.1',
              'ensemblid': 'ENSG00000211459',
-             'frequencymethods': 'Methods\nMultiline',
+             'frequencymethods': 'Methods\n  example',
              'functionmethods': None,
              'genesequenceid': 'NG_042193.1',
              'hgncid': 'HGNC:7470',
@@ -103,3 +103,15 @@ def test_simple_sql_parse():
         ]
     }
 
+
+def test_url_to_dir():
+    assert url_to_cache_dir("https://github.com/cpicpgx/cpic-data/releases/download/v1.10/inserts.sql.gz") == \
+           "github.com/cpicpgx/cpic-data/releases/download/v1.10"
+    assert url_to_cache_dir("https://github.com/cpicpgx/example.zip") == \
+           "github.com/cpicpgx/example"
+
+
+def test_extract_usage():
+    usage = extract_usage(repository_path('README.md')).split("\n")
+    assert usage[0] == "$ openpgx run"
+    assert usage[-1] == "https://github.com/monigenomi/openpgx"

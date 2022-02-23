@@ -1,4 +1,9 @@
-from .helpers import *
+import re
+from collections import defaultdict
+
+from .helpers import (
+    get_normalizations, is_star, load_json, download_to_cache_dir, normalize_hla_gene_and_factor
+)
 
 STRENGTH_MAPPING = {"recommendation": "strong", "impact": "moderate", "pk": "optional"}
 
@@ -65,15 +70,11 @@ def read_fda_entries(fda_json_path):
     return load_json(fda_json_path)["table"]
 
 
-def get_fda_phenoconversion_data(recommendations):
-    return get_phenoconversion_data_from_recommendations(recommendations)
-
-
 FDA_DEFAULT_URL = "https://raw.githubusercontent.com/PharmGKB/fda-biomarker/master/fda_pgx_associations_table.json"
 
 
-def get_fda_recommendations(url=FDA_DEFAULT_URL) -> dict:
-    fda_json_path = download_to_cache_dir(url, "fda")
+def get_fda_recommendations(url: str = FDA_DEFAULT_URL) -> dict:
+    fda_json_path = download_to_cache_dir(url)
 
     entries = read_fda_entries(fda_json_path)
 
@@ -94,3 +95,7 @@ def get_fda_recommendations(url=FDA_DEFAULT_URL) -> dict:
             )
 
     return dict(result)
+
+
+def get_fda_normalizations(recommendations: dict) -> dict:
+    return get_normalizations(recommendations)

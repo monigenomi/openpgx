@@ -198,3 +198,5 @@ data/
 .pdm.toml
 tmp
 tests/cpicdb.pkl
+
+.cache

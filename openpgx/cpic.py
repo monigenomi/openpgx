@@ -6,13 +6,13 @@ import re
 from collections import defaultdict
 from typing import Any, Optional
 
-from loguru import logger
-
 from .helpers import (
     download_to_cache_dir,
     normalize_hla_gene_and_factor,
     sql_to_data,
     yield_inserts_from_file,
+    logger,
+    get_normalizations
 )
 
 CPIC_DEFAULT_URL = (
@@ -305,7 +305,7 @@ def get_url_for_publication(publication):
         return "https://pubmed.ncbi.nlm.nih.gov/" + publication["pmid"] + "/"
 
 
-def get_factors_for_recommendation(recommendation) -> dict:
+def get_factors_for_recommendation(recommendation: dict) -> dict:
     factors = {}
     for gene, factor in recommendation["lookupkey"].items():
         gene, factor = normalize_cpic_factor(gene, factor)
@@ -333,31 +333,31 @@ def get_genotype_index(genesymbol: str, diplotype: str) -> str:
     return genesymbol + ":" + "/".join(sorted(diplotype.split("/")))
 
 
-def get_cpic_phenoconversion_data():
-    pass
-
-
 def load_cpic_database_cached(cached_sql_gz: str):
     global DATA, INDEXES
     cached_file_path = cached_sql_gz + ".pkl"
-    if os.path.exists(cached_file_path):
-        with open(cached_file_path, "rb") as cpicdb:
+    if not os.path.exists(cached_file_path):
+        logger.info("Creating cached cpic database")
+        load_cpic_database(cached_sql_gz)
+        with open(cached_file_path, "wb") as cpicdb:
             DATA = pickle.load(cpicdb)
             INDEXES = {}
-    
-    load_cpic_database(cached_sql_gz)
-    
-    with open(cached_file_path, "wb") as cpicdb:
-        pickle.dump(DATA, cpicdb)
+            pickle.dump(DATA, cpicdb)
+            return
 
+    logger.info("Loading cached cpic database")
+    with open(cached_file_path, "rb") as cpicdb:
+        DATA = pickle.load(cpicdb)
+        INDEXES = {}
+        
 
-def get_cpic_recommendations(url: str = CPIC_DEFAULT_URL) -> dict:
+def get_cpic_recommendations(url: str) -> dict:
     result = defaultdict(list)
-    
-    cached_sql_gz = download_to_cache_dir(url, "cpic")
-    
+    logger.info("Downloading...")
+    cached_sql_gz = download_to_cache_dir(url)
+    logger.info("Loading...")
     load_cpic_database_cached(cached_sql_gz)
-    
+    logger.info("Iterating...")
     for recommendation in DATA["recommendation"]:
         # TODO: check all populations values
         # if recommendation["population"] not in ["general", "adults"]:
@@ -378,8 +378,9 @@ def get_cpic_recommendations(url: str = CPIC_DEFAULT_URL) -> dict:
             }
         )
     
-    return result
+    return dict(result)
 
 
-def cpic_main():
-    return get_cpic_recommendations()
+def get_cpic_normalizations(recommendations: dict) -> dict:
+    return get_normalizations(recommendations)
+    

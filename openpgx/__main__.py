@@ -1,44 +1,49 @@
-import argparse
 import json
+import sys
+
 from typing import IO, Optional
+from argparse import ArgumentParser
 
-from . import get_recommendations
-from .cpic import cpic_main
+from . import create_database, save_database, get_recommendations
 
-
-class ArgumentParser(argparse.ArgumentParser):
-    def print_help(self, _: Optional[IO[str]] = ...) -> None:
-        print(
-            """
-        Calculates pharmacogenomic recommendations for each supported drug
-        """
-        )
-
-
-# recommendations = get_all_recommendations()
-# save_json('recommendations.json', recommendations)
-
-
-def main():
-    parser = ArgumentParser(prog="openpgx")
-
-    parser.add_argument(
-        "-i",
-        "--input",
-        help="Path to json with genotypes example: 'gene': '*1/*1'",
-        required=True,
-    )
-    args = vars(parser.parse_args())
-
-    def load_json(path):
-        with open(path) as f:
-            return json.load(f)
-
-    input = load_json(args["input"])
-    result = get_recommendations(input)
-
-    print(json.dumps(result, indent=2))
-
+from .helpers import (
+    load_json,
+    save_json,
+    repository_path,
+    logger,
+    extract_usage
+)
 
 if __name__ == "__main__":
-    cpic_main()
+    logger.add(sys.stderr,
+               level="INFO",
+               format="<level>{level: <8}</level> {message} {extra}")
+    
+    parser = ArgumentParser(prog="openpgx")
+    parser.add_argument('command', nargs='*')
+    parser.add_argument("-g", "--genotype")
+    parser.add_argument("-o", "--output", default="recommendations.json")
+    parser.add_argument("--cpic")
+    parser.add_argument("--dpwg")
+    parser.add_argument("--fda")
+    args = vars(parser.parse_args())
+    command = args["command"]
+    
+    if len(command) == 0:
+        help = extract_usage(repository_path('README.md'))
+    
+    
+    if command[0] == "update":
+        db = create_database(cpic=args["cpic"], dpwg=args["dpwg"], fda=args["fda"])
+        save_database(db)
+            
+    else:
+        genotype = {}
+        if "input" in args:
+            genotype = load_json(args["genotype"])
+        recommendations = get_recommendations(genotype)
+        save_json(args["output"], recommendations)
+            
+    #input = load_json(args["input"])
+    #recommendations = get_recommendations(input)
+    #save_json(args["output"], recommendations)

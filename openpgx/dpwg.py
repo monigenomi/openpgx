@@ -8,7 +8,7 @@ import bs4
 from .helpers import (
     download_to_cache_dir,
     format_with_populations,
-    get_phenoconversion_data_from_recommendations,
+    get_normalizations,
     is_star,
     load_json,
 )
@@ -75,7 +75,7 @@ FACTOR_NORMALIZATION = {
     "VKORC1 rs9923231 AG": "rs9923231 reference (C)",
     "VKORC1 -1639 AG": "rs9923231 reference (C)",
     # TODO: check if is possible to use in this recommendations poor function and indeterminate function for SLCO1B1
-    #  (phenoconversion from CPIC, the same as is named in fda: "521 TC or 521 CC (intermediate or poor function transporters)"
+    #  (phenotyping from CPIC, the same as is named in fda: "521 TC or 521 CC (intermediate or poor function transporters)"
     "SLCO1B1 521 CC": "521 CC",
     "SLCO1B1 521 TC": "521 TC",
     # TYPO in database
@@ -189,18 +189,17 @@ def load_dpwg_entry(gene_drug_filename: str) -> dict:
 
 
 # TODO - saved json contains only default recommendations with empty factors, but shoudln't
-
 DPWG_DEFAULT_URL = (
     "https://api.pharmgkb.org/v1/download/file/data/dosingGuidelines.json.zip"
 )
 
 
-def get_dpwg_recommendations(url=DPWG_DEFAULT_URL) -> dict:
-    cache_dir = download_to_cache_dir(url, "dpwg")
+def get_dpwg_recommendations(url: str = DPWG_DEFAULT_URL) -> dict:
+    dpwg_database_path = download_to_cache_dir(url)
 
     wildcard = path.join(
         path.dirname(path.realpath(__file__)),
-        f"{cache_dir}/Annotation_of_DPWG_*.json",
+        f"{dpwg_database_path}/Annotation_of_DPWG_*.json",
     )
 
     entries = [load_dpwg_entry(filename) for filename in glob.glob(wildcard)]
@@ -255,6 +254,5 @@ def get_dpwg_recommendations(url=DPWG_DEFAULT_URL) -> dict:
 
     return dict(result)
 
-
-def get_dpwg_phenoconversion_data(recommendations):
-    return get_phenoconversion_data_from_recommendations(recommendations)
+def get_dpwg_normalizations(recommendations: dict) -> dict:
+    return get_normalizations(recommendations)

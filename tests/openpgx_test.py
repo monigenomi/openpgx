@@ -48,7 +48,7 @@ def test_get_recommendation_for_drug():
         },
     }
     assert get_recommendations_for_drug(
-        "allopurinol", phenoconversion({"HLA-B*58:01": "positive"})
+        "allopurinol", phenotyping({"HLA-B*58:01": "positive"})
     ) == {
         "cpic": {
             "factors": {"HLA-B*58:01": "positive"},
@@ -65,7 +65,7 @@ def test_get_recommendation_for_drug():
         },
     }
     assert get_recommendations_for_drug(
-        "allopurinol", phenoconversion({"HLA-B*58:01": "negative"})
+        "allopurinol", phenotyping({"HLA-B*58:01": "negative"})
     ) == {
         "cpic": {
             "factors": {"HLA-B*58:01": "negative"},
@@ -76,9 +76,9 @@ def test_get_recommendation_for_drug():
     }
 
 
-def test_phenoconversion():
+def test_phenotyping():
     # example of input and output to this function
-    assert phenoconversion({"CYP2D6": "*2≥3/*1≥3"}) == {
+    assert phenotyping({"CYP2D6": "*2≥3/*1≥3"}) == {
         "CYP2D6": {
             "activityscore": 6.0,
             "cpic_factor": "Ultrarapid Metabolizer",
@@ -87,7 +87,7 @@ def test_phenoconversion():
     }
 
     def short_(gene, genotype):
-        result = phenoconversion({gene: genotype})[gene]
+        result = phenotyping({gene: genotype})[gene]
         return result["activityscore"], result["cpic_factor"], result["factor"]
 
     # "normal genes"
@@ -112,10 +112,10 @@ def test_phenoconversion():
     # Phenotype in CPIC
     assert short_("SLCO1B1", "*1A/*1B") == (None, "Normal Function", "normal function")
 
-    # CPIC Phenoconversion impossible (allele does not exists) but 521 CC exists in dpwg and fda both
+    # CPIC phenotyping impossible (allele does not exists) but 521 CC exists in dpwg and fda both
     assert short_("SLCO1B1", "521 CC") == (None, None, "521 CC")
 
-    # Allele based recommendation - "rs9923231 reference (C)" exists in CPIC but no phenoconversion possible
+    # Allele based recommendation - "rs9923231 reference (C)" exists in CPIC but no phenotyping possible
     assert short_("VKORC1", "rs9923231 reference (C)") == (
         None,
         None,
@@ -212,3 +212,7 @@ def test_no_duplicate_factors_in_recommendations():
                         str(recommendation) + "\n" + str(existing[key])
                     )
                 existing[key] = recommendation
+
+
+def test_get_genotype_indexes():
+    assert get_genotype_indexes("CYP2D6", "*2≥3/*1≥3") == []
