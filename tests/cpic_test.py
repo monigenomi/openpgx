@@ -1,111 +1,37 @@
 #!/usr/bin/env python3
 
-from openpgx.cpic import *
-from openpgx.helpers import *
+from openpgx.tmp_cpic import *
 
-CPIC_RECOMMENDATIONS = get_cpic_recommendations()
-
-
-def test_normalize_activityscore():
-    assert normalize_activityscore("No result") == None
-    assert normalize_activityscore("n/a") == None
-    assert normalize_activityscore("1") == "== 1.00"
-    assert normalize_activityscore("≥4") == ">= 4.00"
-    assert normalize_activityscore("4.25") == "== 4.25"
+load_cpic_database_from_url(CPIC_DEFAULT_URL)
 
 
-def test_get():
-    assert select("gene", "symbol", "CYP2D6")[0]["chr"] == "chr22"
-
-
-def test_get_factors_for_recommendation():
-    result = get_factors_for_recommendation(
+def test_get_alleles():
+    assert get_alleles([
         {
-            "id": 872151,
-            "guidelineid": 100421,
-            "drugid": "RxNorm:190521",
-            "implications": {
-                "HLA-B": "Low or reduced risk of abacavir hypersensitivity"
-            },
-            "drugrecommendation": "Use abacavir per standard dosing guidelines",
-            "classification": "Strong",
-            "phenotypes": {},
-            "activityscore": {},
-            "allelestatus": {"HLA-B": "HLA-B*57:01 negative"},
-            "lookupkey": {"HLA-B": "*57:01 negative"},
-            "population": "general",
-            "comments": "n/a",
-            "version": 1,
+            'id': 828130, 'version': 11, 'genesymbol': 'MT-RNR1', 'name': '1095T>C', 'functionalstatus': None,
+            'clinicalfunctionalstatus': 'increased risk of aminoglycoside-induced hearing loss',
+            'clinicalfunctionalsubstrate': None, 'activityvalue': 'n/a', 'definitionid': 828129,
+            'citations': '{11079536,11313749,15555598,15841390,16875663,21205314}', 'strength': 'Moderate',
+            'functioncomments': None,
+            'findings': 'MT-RNR1 1095T>C is assigned an increased risk of aminoglycoside-induced hearing loss based on moderate evidence. Screening of individuals or probands of individuals with aminoglycoside-hearing looss identified 1095T>C in a number of cases (11079536, 11313749, 15555598, 15841390, 16875663, 21205314). Therefore, consensus among experts was this variant is associated with increased risk of aminoglycoside-induced hearing loss based on moderate evidence.'
+        },
+        {
+            'id': 777350, 'version': 11, 'genesymbol': 'CFTR', 'name': 'G551D', 'functionalstatus': None,
+            'clinicalfunctionalstatus': 'ivacaftor responsive', 'clinicalfunctionalsubstrate': None,
+            'activityvalue': None, 'definitionid': 777349, 'citations': '{}', 'strength': None,
+            'functioncomments': 'ACMG screening panel', 'findings': None
+        },
+        {
+            'id': 777316, 'version': 11, 'genesymbol': 'CFTR', 'name': '711+3A->G', 'functionalstatus': None,
+            'clinicalfunctionalstatus': 'ivacaftor responsive', 'clinicalfunctionalsubstrate': None,
+            'activityvalue': None, 'definitionid': 777315, 'citations': '{}', 'strength': None,
+            'functioncomments': 'ACMG screening panel', 'findings': None
         }
-    )
-    assert result == {"HLA-B*57:01": "negative"}
-
-
-def test_get_cpic_recommendations():
-    assert CPIC_RECOMMENDATIONS["rasburicase"] == [
-        {
-            "factors": {"G6PD": "Normal"},
-            "guideline": "https://cpicpgx.org/guidelines/guideline-for-rasburicase-and-g6pd/",
-            "recommendation": "No reason to withhold rasburicase based on G6PD status.",
-            "strength": "strong",
-        },
-        {
-            "factors": {"G6PD": "Variable"},
-            "guideline": "https://cpicpgx.org/guidelines/guideline-for-rasburicase-and-g6pd/",
-            "recommendation": "To ascertain that G6PD status is normal, enzyme activity "
-            "must be measured; alternatives include allopurinol.",
-            "strength": "moderate",
-        },
-        {
-            "factors": {"G6PD": "Deficient"},
-            "guideline": "https://cpicpgx.org/guidelines/guideline-for-rasburicase-and-g6pd/",
-            "recommendation": "Rasburicase is contraindicated; alternatives include "
-            "allopurinol.",
-            "strength": "strong",
-        },
-    ]
-    assert CPIC_RECOMMENDATIONS["abacavir"] == [
-        {
-            "factors": {"HLA-B*57:01": "negative"},
-            "guideline": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/",
-            "recommendation": "Use abacavir per standard dosing guidelines",
-            "strength": "strong",
-        },
-        {
-            "factors": {"HLA-B*57:01": "positive"},
-            "guideline": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/",
-            "recommendation": "Abacavir is not recommended",
-            "strength": "strong",
-        },
-    ]
-    assert len(CPIC_RECOMMENDATIONS) == 63
-
-
-def test_check_lookup_is_valid():
-    def create_all_possible_ascores():
-        result = []
-        for i in range(0, 1000, 5):
-            result.append("== " + str("{:.2f}".format(i / 100)))
-            result.append(">= " + str("{:.2f}".format(i / 100)))
-        return result + [None]
-
-    activity_scores = create_all_possible_ascores()
-    cpic_factors = list(PHENOTYPE_AND_ALLELE_NORMALIZATIONS_CPIC.keys())
-    for drug, recommendations in CPIC_RECOMMENDATIONS.items():
-        for recommendation in recommendations:
-            for gene, value in recommendation["factors"].items():
-                assert (
-                    value in cpic_factors or value in activity_scores
-                ), f"{drug} {gene} {value}"
-
-
-# TODO: what happens if factors: {gene1: None, gene2: Ultrarapid metabolizer} - None is when gene was not provided
-def test_phenotyping():
-    result = get_cpic_phenotyping_data([])
-
-    assert result != {}
-    assert result["CYP2D6:*1/*1"] == ["Normal Metabolizer", 2.0]
-    assert result["HLA-B*57:01:negative"] == ["negative", None]
+    
+    ]) == {
+               "CFTR": [{"allele": "G551D"}, {"allele": "711+3A->G"}],
+               "MT-RNR1": [{"allele": "1095T>C"}]
+           }
 
 
 def test_normalize_cpic_factor():
@@ -113,3 +39,79 @@ def test_normalize_cpic_factor():
     assert normalize_cpic_factor("AAA", "No Result") == ("AAA", None)
     assert normalize_cpic_factor("FOO", "n/a") == ("FOO", None)
 
+
+def test_normalize_genename():
+    assert normalize_genename("CYP2D6", "*1/*1") == "CYP2D6"
+    assert normalize_genename("HLA-A", "*15:02 positive") == "HLA-A*15:02"
+
+
+def test_normalize_activityscore():
+    # For factors
+    assert normalize_activityscore("1", True) == "== 1.00"
+    assert normalize_activityscore("n/a", True) == None
+    assert normalize_activityscore("≥4", True) == ">= 4.00"
+    # For phenotype table
+    assert normalize_activityscore("1", False) == 1.00
+    assert normalize_activityscore("1.00", False) == 1.00
+    assert normalize_activityscore("> 1.5", False) == 1.50
+    assert normalize_activityscore("≥4", False) == 4.00
+
+
+def test_create_phenotype_and_activityscore_table():
+    activityscore, phenotype = create_phenotype_and_activityscore_table(DATA["gene_result_diplotype"],
+                                                                        DATA["gene_result_lookup"],
+                                                                        DATA["gene_result"])
+    
+    assert activityscore["CYP2C9"][0] == {
+        'activityscore': 2.00,
+        'genotypes': [['*1', '*1'], ['*1', '*9'], ['*9', '*9']]
+    }
+    assert phenotype['CACNA1S'][0] == {
+        'genotypes': [['c.3257G>A', 'c.3257G>A'],
+                      ['c.3257G>A', 'c.520C>T'],
+                      ['c.520C>T', 'c.520C>T'],
+                      ['Reference', 'c.520C>T'],
+                      ['Reference', 'c.3257G>A']],
+        'phenotype': 'Malignant Hyperthermia Susceptibility'
+    }
+    
+    assert phenotype["HLA-B*15:02"][0] == {  # TODO - maybe it should have different format?
+        "phenotype": "negative",
+        "genotypes": [
+            ["negative"]
+        ]
+    }
+
+
+def test_normalize_factors():
+    assert normalize_factors_for_recommendation({'HLA-B': '*57:01 positive'}) == {'HLA-B*57:01': 'positive'}
+    assert normalize_factors_for_recommendation({
+        "CYP2D6": "Ultrarapid Metabolizer", "CYP2C19": "Ultrarapid Metabolizer"
+    }) == {
+               "CYP2D6": "ultrarapid metabolizer", "CYP2C19": "ultrarapid metabolizer"
+           }
+    assert normalize_factors_for_recommendation({
+        "CYP2D6": "0.5", "CYP2C19": "Likely Poor Metabolizer"
+    }) == {"CYP2D6": "== 0.50", "CYP2C19": "poor metabolizer"}
+    assert normalize_factors_for_recommendation({"SOME_GENE": "2"}) == {"SOME_GENE": "== 2.00"}
+
+
+def test_create_cpic_recommendations():
+    assert create_cpic_recommendations()["abacavir"] == [
+        {
+            "factors": {
+                "HLA-B*57:01": "negative"
+            },
+            "recommendation": "Use abacavir per standard dosing guidelines",
+            "strength": "strong",
+            "guideline": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/"
+        },
+        {
+            "factors": {
+                "HLA-B*57:01": "positive"
+            },
+            "recommendation": "Abacavir is not recommended",
+            "strength": "strong",
+            "guideline": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/"
+        }
+    ]
