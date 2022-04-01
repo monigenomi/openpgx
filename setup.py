@@ -61,7 +61,9 @@ package(
             "pre-commit",
             "pylint",
             "pytest",
-            "isort==5.9.3"
+            "isort==5.9.3",
+            "jupyter",
+            "pandas"
         ]
     },
     python_requires="~=3.8",

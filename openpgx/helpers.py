@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 import re
@@ -194,6 +195,13 @@ def url_to_cache_dir(url: str) -> str:
     return parsed.hostname + os.path.dirname(parsed.path)
 
 
+def parse_copy(sql: str) -> dict:
+    table_name, columns = re.search(r"COPY\s+(?:(?:[^(\.]+)\.)?([^(\.]+)\s+\(([^)]+)\)\s+FROM\s+stdin", sql).groups()
+    column_names = [c.strip() for c in columns.split(r",")]
+    
+    return table_name, column_names
+
+
 def repository_path(path: str) -> str:
     return str(Path(__file__).joinpath('../../' + path).resolve())
 
@@ -233,43 +241,6 @@ def download_to_cache_dir(url, force=False):
         return download_path
 
 
-def const_to_val(const):
-    if type(const) == pglast.ast.TypeCast:
-        return {
-            't': True,
-            'f': False
-        }[const.arg.val.val]
-    
-    value = const.val.val
-    if type(value) == str and value[0:2] == '{"':
-        if value[0:1] == '{"':
-            value = json.loads(value)
-        elif value[0] == "{" and "," in value:
-            return None
-    
-    return value
-
-
-def sql_to_data(sql):
-    parsed = pglast.parser.parse_sql(sql)
-    names = [col.name for col in parsed[0].stmt.cols]
-    values = [const_to_val(value) for value in parsed[0].stmt.selectStmt.valuesLists[0]]
-    return parsed[0].stmt.relation.relname, dict(zip(names, values))
-
-
-def yield_inserts_from_file(file):
-    query = ""
-    for line in file.readlines():
-        if len(query) > 0:
-            query += line
-        elif "INSERT INTO" in line:
-            query = line
-        
-        if len(query) > 1 and query[-2] == ";":
-            yield query
-            query = ""
-
-
 def add_traceback(record):
     if record["level"].name == "ERROR":
         record["message"] = colored(record["message"], "red")
@@ -281,6 +252,43 @@ def add_traceback(record):
     tb = traceback.extract_stack()
     tb = [f"{t[1]}: {t[3]}" for t in tb[::-1] if t.filename == tb[-1].filename]
     record["stacktrace"] = "\n".join(list(dict.fromkeys(tb[2:])))
+
+
+def yield_rows_from_sql_file(path: str):
+    with open(path, 'r') as sql_file:
+        table, columns, lines, reading = None, None, [], False
+        
+        for line in sql_file:
+            if re.match("\s*COPY", line):
+                table, columns = parse_copy(line)
+                reading = True
+                continue
+            
+            if line[0:2] == "\\.":
+                reading = False
+                reader = csv.DictReader(lines, fieldnames=columns, dialect='excel-tab')
+                for row in reader:
+                    for key, value in row.items():
+                        if value is not None:
+                            if value == '\\N':
+                                row[key] = None
+                            elif value[0:1] == '{"':
+                                row[key] = json.loads(value)
+                            elif value == 'f':
+                                row[key] = False
+                            elif value == 't':
+                                row[key] = True
+                            elif value[0] == "{" and "," in value:
+                                # we for now don't need sets like '{22232210}'
+                                row[key] = None
+                    
+                    yield table, row
+                
+                lines = []
+                continue
+            
+            if reading:
+                lines.append(line)
 
 
 logger.configure(

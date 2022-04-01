@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from openpgx.tmp_cpic import *
+from openpgx.cpic import *
+from openpgx.helpers import save_json
 
 load_cpic_database_from_url(CPIC_DEFAULT_URL)
 
@@ -62,20 +63,19 @@ def test_create_phenotype_and_activityscore_table():
                                                                         DATA["gene_result_lookup"],
                                                                         DATA["gene_result"])
     
-    assert activityscore["CYP2C9"][0] == {
-        'activityscore': 2.00,
-        'genotypes': [['*1', '*1'], ['*1', '*9'], ['*9', '*9']]
-    }
+    activity_two = [i for i in activityscore["CYP2C9"] if i["activityscore"] == 2.00][0]
+    assert activity_two == {'activityscore': 2.0, 'genotypes': [['*1', '*1'], ['*9', '*9'], ['*1', '*9']]}
     assert phenotype['CACNA1S'][0] == {
         'genotypes': [['c.3257G>A', 'c.3257G>A'],
-                      ['c.3257G>A', 'c.520C>T'],
                       ['c.520C>T', 'c.520C>T'],
                       ['Reference', 'c.520C>T'],
-                      ['Reference', 'c.3257G>A']],
-        'phenotype': 'Malignant Hyperthermia Susceptibility'
+                      ['Reference', 'c.3257G>A'],
+                      ['c.3257G>A', 'c.520C>T']],
+        'phenotype': 'malignant hyperthermia susceptibility'
     }
     
-    assert phenotype["HLA-B*15:02"][0] == {  # TODO - maybe it should have different format?
+    assert [i for i in phenotype["HLA-B*15:02"] if i["phenotype"] == "negative"][0] == {
+        # TODO - maybe it should have different format?
         "phenotype": "negative",
         "genotypes": [
             ["negative"]
@@ -92,7 +92,7 @@ def test_normalize_factors():
            }
     assert normalize_factors_for_recommendation({
         "CYP2D6": "0.5", "CYP2C19": "Likely Poor Metabolizer"
-    }) == {"CYP2D6": "== 0.50", "CYP2C19": "poor metabolizer"}
+    }) == {"CYP2D6": "== 0.50", "CYP2C19": "likely poor metabolizer"}
     assert normalize_factors_for_recommendation({"SOME_GENE": "2"}) == {"SOME_GENE": "== 2.00"}
 
 
@@ -104,7 +104,8 @@ def test_create_cpic_recommendations():
             },
             "recommendation": "Use abacavir per standard dosing guidelines",
             "strength": "strong",
-            "guideline": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/"
+            "guideline": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/",
+            "population": "general"
         },
         {
             "factors": {
@@ -112,6 +113,37 @@ def test_create_cpic_recommendations():
             },
             "recommendation": "Abacavir is not recommended",
             "strength": "strong",
-            "guideline": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/"
+            "guideline": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/",
+            "population": "general"
         }
     ]
+
+
+def test_write_to_file():
+    save_json("/tmp/raw_cpic.json", create_cpic_recommendations())
+
+
+def test_check_guideline():
+    def help():
+        rec = create_cpic_recommendations()
+        result = []
+        for drugname, values in rec.items():
+            guidelines = set()
+            for factor in values:
+                guidelines.add(factor["guideline"])
+            is_drug_in_guideline_url = False
+            for i in guidelines:
+                if drugname in i:
+                    is_drug_in_guideline_url = True
+            result.append({
+                "drug": drugname,
+                "guidelines": guidelines,
+                "count_guidelines": len(guidelines),
+                "is_drug_in_guideline_url": is_drug_in_guideline_url
+            })
+        return result
+    
+    for i in help():
+        if i["is_drug_in_guideline_url"] == False:
+            print(i["drug"])
+            print(i["guidelines"])

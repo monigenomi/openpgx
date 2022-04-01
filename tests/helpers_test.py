@@ -5,6 +5,7 @@ from openpgx.helpers import *
 
 cwd = os.path.dirname(os.path.realpath(__file__))
 
+
 def test_index_table_by_something():
     result = index_items_by_key(
         [
@@ -13,22 +14,20 @@ def test_index_table_by_something():
         ],
         "Gene",
     )
-
+    
     expected = {
         "CYP2D6": [
             {"Drug": "Tamsulosin", "Gene": "CYP2D6"},
             {"Drug": "Trimipramine", "Gene": "CYP2D6"},
         ]
     }
-
+    
     assert result == expected
 
 
-def test_get_phenotyping_data_from_recommendations():
-    assert (
-        len(get_normalizations(get_dpwg_recommendations()))
-        > 0
-    )
+def test_get_normalizations():
+    print(get_dpwg_recommendations())
+    assert len(get_normalizations(get_dpwg_recommendations())) != 0
 
 
 def test_normalize_gene_and_factor():
@@ -55,52 +54,85 @@ def test_format_with_populations():
             "CBZ naive": {"recommendation": "world", "foo": "bar"},
         }
     ) == {
-        "recommendation": "Adults: hello\n\nIf patient has not previously used carbamazepine: world",
-        "foo": "bar",
-    }
+               "recommendation": "Adults: hello\n\nIf patient has not previously used carbamazepine: world",
+               "foo": "bar",
+           }
 
-def test_simple_sql_parse():
-    file = open(os.path.join(cwd, "fixtures/cpic_inserts.sql"), 'r')
+
+def test_import_parse_copy():
+    # TODO:
+    # 1. parse first line with regexp to extract table name and column names
+    # 2. parse next lines up until \. to extract data. use tsv reader
+    #    https://www.pythonpool.com/read-tsv-file-python/
+    
+    input = "COPY cpic.allele (id, version, genesymbol, name, functionalstatus, clinicalfunctionalstatus, clinicalfunctionalsubstrate, activityvalue, definitionid, citations, strength, functioncomments, findings, frequency) FROM stdin;"
+    
+    table, columns = parse_copy(input)
+    
+    assert table == "allele"
+    assert columns == ['id', 'version', 'genesymbol', 'name', 'functionalstatus', 'clinicalfunctionalstatus',
+                       'clinicalfunctionalsubstrate', 'activityvalue', 'definitionid', 'citations', 'strength',
+                       'functioncomments', 'findings', 'frequency']
+
+
+def test_yield_rows_from_sql_file():
     database = defaultdict(list)
-    for query in yield_inserts_from_file(file):
-        table_name, row = sql_to_data(query)
-        database[table_name].append(row)
+    for table, row in yield_rows_from_sql_file(os.path.join(cwd, "fixtures/cpic.sql")):
+        database[table].append(row)
     assert dict(database) == {
-        'allele_definition': [
-            {'genesymbol': 'HLA-A',
-             'id': 9000,
-             'name': '*31:01',
-             'pharmvarid': None,
-             'reference': False,
-             'structuralvariation': False,
-             'version': 1},
-            {'genesymbol': 'HLA-B',
-             'id': 9001,
-             'name': '*31:02',
-             'pharmvarid': None,
-             'reference': True,
-             'structuralvariation': True,
-             'version': 2}
-        ],
-        'gene': [
-            {'chr': 'chrM',
-             'chromosequenceid': 'NC_012920.1',
-             'ensemblid': 'ENSG00000211459',
-             'frequencymethods': 'Methods\n  example',
-             'functionmethods': None,
-             'genesequenceid': 'NG_042193.1',
-             'hgncid': 'HGNC:7470',
-             'lookupmethod': 'PHENOTYPE',
-             'mrnasequenceid': 'NM_001042351.2',
-             'ncbiid': '4549',
-             'notesondiplotype': None,
-             'pharmgkbid': 'PA31274',
-             'proteinsequenceid': 'NP_000101.2',
-             'symbol': 'MT-RNR1',
-             'url': 'https://cpicpgx.org/gene/mt-rnr1/',
-             'version': 43
-             }
-        ]
+        'allele': [{
+            'activityvalue': None,
+            'citations': '{}',
+            'clinicalfunctionalstatus': 'Normal Function',
+            'clinicalfunctionalsubstrate': None,
+            'definitionid': '777262',
+            'findings': None,
+            'frequency': None,
+            'functionalstatus': None,
+            'functioncomments': None,
+            'genesymbol': 'CACNA1S',
+            'id': '777263',
+            'name': 'Reference',
+            'strength': None,
+            'version': '25'
+        },
+            {
+                'activityvalue': None,
+                'citations': '{22232210}',
+                'clinicalfunctionalstatus': 'No function',
+                'clinicalfunctionalsubstrate': None,
+                'definitionid': '1357093',
+                'findings': 'SLCO1B1*48 is assigned no function due to evidence '
+                            'supporting a partial gene deletion (22232210). '
+                            'Therefore, consensus among experts was no function '
+                            'due to limited evidence.',
+                'frequency': None,
+                'functionalstatus': None,
+                'functioncomments': None,
+                'genesymbol': 'SLCO1B1',
+                'id': '1357094',
+                'name': '*49',
+                'strength': 'Limited',
+                'version': '9'
+            }],
+        'allele_definition': [{
+            'genesymbol': 'HLA-A',
+            'id': '9000',
+            'name': '*31:01',
+            'pharmvarid': None,
+            'reference': False,
+            'structuralvariation': False,
+            'version': '1'
+        },
+            {
+                'genesymbol': 'HLA-B',
+                'id': '9001',
+                'name': '*15:02',
+                'pharmvarid': None,
+                'reference': False,
+                'structuralvariation': False,
+                'version': '1'
+            }]
     }
 
 
@@ -113,5 +145,5 @@ def test_url_to_dir():
 
 def test_extract_usage():
     usage = extract_usage(repository_path('README.md')).split("\n")
-    assert usage[0] == "$ openpgx run"
+    assert usage[0][0:9] == "$ openpgx"
     assert usage[-1] == "https://github.com/monigenomi/openpgx"

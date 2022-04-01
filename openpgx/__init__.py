@@ -5,7 +5,7 @@ from typing import Optional
 
 from loguru import logger
 
-from .cpic import get_cpic_recommendations, is_haplo_or_diplo, CPIC_DEFAULT_URL, get_cpic_normalizations
+from .cpic import CPIC_DEFAULT_URL  # , get_cpic_normalizations, get_cpic_recommendations,
 from .dpwg import get_dpwg_recommendations, DPWG_DEFAULT_URL, get_dpwg_normalizations
 from .fda import get_fda_recommendations, FDA_DEFAULT_URL, get_fda_normalizations
 from .helpers import (

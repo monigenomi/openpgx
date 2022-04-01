@@ -17,6 +17,10 @@ VARIANT_MAPPING_FDA = {
 }
 
 
+def read_fda_entries(fda_json_path):
+    return load_json(fda_json_path)["table"]
+
+
 def normalize_strength(strength: str) -> str:
     if strength in STRENGTH_MAPPING:
         return STRENGTH_MAPPING[strength]
@@ -66,11 +70,9 @@ def subgroups_to_factors(subgroups: str) -> list:
     return factors
 
 
-def read_fda_entries(fda_json_path):
-    return load_json(fda_json_path)["table"]
-
 
 FDA_DEFAULT_URL = "https://raw.githubusercontent.com/PharmGKB/fda-biomarker/master/fda_pgx_associations_table.json"
+
 
 
 def get_fda_recommendations(url: str = FDA_DEFAULT_URL) -> dict:

@@ -1,6 +1,8 @@
 from openpgx.dpwg import *
 from openpgx.helpers import *
 
+
+DATA_DIRECTORY="../.cache/api.pharmgkb.org/v1/download/file/data/dosingGuidelines.json/"
 DPWG_RECOMMENDATIONS = get_dpwg_recommendations()
 
 
@@ -18,10 +20,10 @@ def test_normalize_dpwg_factor():
     assert normalize_dpwg_factor("CYP2D6 UM") == "ultrarapid metabolizer"
     assert normalize_dpwg_factor("HLA-B*57:01") == "*57:01 positive"
     assert normalize_dpwg_factor("HLA-B*44") == "*44 positive"
-
+    
 
 def test_converter():
-    base_dir = path.join(path.dirname(path.realpath(__file__)), "../data/dpwg/")
+    base_dir = path.join(path.dirname(path.realpath(__file__)), DATA_DIRECTORY)
     raw_data = load_json(
         path.join(
             base_dir, "Annotation_of_DPWG_Guideline_for_aripiprazole_and_CYP2D6.json"
@@ -41,7 +43,7 @@ def test_converter():
 
 
 def test_therapy_table():
-    base_dir = path.join(path.dirname(path.realpath(__file__)), "../data/dpwg/")
+    base_dir = path.join(path.dirname(path.realpath(__file__)), DATA_DIRECTORY)
     irinotecan = load_json(
         path.join(
             base_dir, "Annotation_of_DPWG_Guideline_for_irinotecan_and_UGT1A1.json"
@@ -75,7 +77,7 @@ def test_message_for_no_recommendations():
 
 
 def test_load_dpwg_entry():
-    base_dir = path.join(path.dirname(path.realpath(__file__)), "../data/dpwg/")
+    base_dir = path.join(path.dirname(path.realpath(__file__)), DATA_DIRECTORY)
     assert (
         load_dpwg_entry(
             path.join(

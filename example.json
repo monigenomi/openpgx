@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "sources": {
+    "cpic": "https://github.com/cpicpgx/cpic-data/releases/download/v1.10/cpic_db_dump-v1.10_inserts.sql.gz",
+    "dpwg": "https://api.pharmgkb.org/v1/download/file/data/dosingGuidelines.json.zip",
+    "fda": "https://raw.githubusercontent.com/PharmGKB/fda-biomarker/master/fda_pgx_associations_table.json"
+  },
+  "activityscores": {
+    "CYP2D6": [
+      {
+        "activityscore": 5,
+        "genotypes": [
+          ["*1", "*1"],
+          ["*1", "*2"]
+        ]
+      }
+    ]
+  },
+  "phenotypes": {
+    "CYP2D6": [
+      {
+        "phenotype": "ultrarapid metabolizer",
+        "genotypes": [
+          ["*1", "*1"]
+        ]
+      }
+    ]
+  },
+  "alleles": {
+    "CYP2D6": [
+      {
+        "allele": "*2"
+      }
+    ]
+  },
+  "recommendations": {
+    "cpic": {
+      "abacavir": [
+        {
+          "factors": [
+            {
+              "gene": "HLA-B*57:01",
+              "genotype": "positive"
+            }
+          ],
+          "recommendation": "Use abacavir per standard dosing guidelines",
+          "strength": "strong",
+          "guideline": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/"
+        }
+      ]
+    }
+  }
+}
