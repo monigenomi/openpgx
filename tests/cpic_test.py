@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
+import os
 
 from openpgx.cpic import *
 from openpgx.helpers import save_json
 
-load_cpic_database_from_url(CPIC_DEFAULT_URL)
+CPIC_DATABASE = create_cpic_database()
+CPIC_RECOMMENDATIONS = CPIC_DATABASE["recommendations"]
+
+cwd = os.path.dirname(os.path.realpath(__file__))
+
+cached_sql_gz = download_to_cache_dir(CPIC_DEFAULT_URL)
+
+DATA = load_cpic_dump(cached_sql_gz)
 
 
 def test_get_alleles():
@@ -36,7 +44,7 @@ def test_get_alleles():
 
 
 def test_normalize_cpic_factor():
-    assert normalize_cpic_factor("HLA-A", "No *12 Result") == ("HLA-A", None)
+    assert normalize_cpic_factor("HLA-A", "No *12 Result") == ("HLA-A*12", None)
     assert normalize_cpic_factor("AAA", "No Result") == ("AAA", None)
     assert normalize_cpic_factor("FOO", "n/a") == ("FOO", None)
 
@@ -71,10 +79,10 @@ def test_create_phenotype_and_activityscore_table():
                       ['Reference', 'c.520C>T'],
                       ['Reference', 'c.3257G>A'],
                       ['c.3257G>A', 'c.520C>T']],
-        'phenotype': 'malignant hyperthermia susceptibility'
+        'phenotype': 'Malignant Hyperthermia Susceptibility'
     }
     
-    assert [i for i in phenotype["HLA-B*15:02"] if i["phenotype"] == "negative"][0] == {
+    assert [i for i in phenotype["HLA-B*15:02"] if i["phenotype"] == "negative"] == {
         # TODO - maybe it should have different format?
         "phenotype": "negative",
         "genotypes": [
@@ -83,49 +91,33 @@ def test_create_phenotype_and_activityscore_table():
     }
 
 
-def test_normalize_factors():
-    assert normalize_factors_for_recommendation({'HLA-B': '*57:01 positive'}) == {'HLA-B*57:01': 'positive'}
-    assert normalize_factors_for_recommendation({
-        "CYP2D6": "Ultrarapid Metabolizer", "CYP2C19": "Ultrarapid Metabolizer"
-    }) == {
-               "CYP2D6": "ultrarapid metabolizer", "CYP2C19": "ultrarapid metabolizer"
-           }
-    assert normalize_factors_for_recommendation({
-        "CYP2D6": "0.5", "CYP2C19": "Likely Poor Metabolizer"
-    }) == {"CYP2D6": "== 0.50", "CYP2C19": "likely poor metabolizer"}
-    assert normalize_factors_for_recommendation({"SOME_GENE": "2"}) == {"SOME_GENE": "== 2.00"}
+def test_normalize_cpic_factors():
+    assert normalize_cpic_factors({'HLA-B': '*57:01 positive'}) == {'HLA-B*57:01': 'positive'}
+    assert normalize_cpic_factors({"SOME_GENE": "2"}) == {"SOME_GENE": "== 2.00"}
 
 
 def test_create_cpic_recommendations():
-    assert create_cpic_recommendations()["abacavir"] == [
-        {
-            "factors": {
-                "HLA-B*57:01": "negative"
-            },
-            "recommendation": "Use abacavir per standard dosing guidelines",
-            "strength": "strong",
-            "guideline": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/",
-            "population": "general"
+    assert CPIC_RECOMMENDATIONS["abacavir"] == [{
+        'factors': {
+            'HLA-B*57:01': 'negative', 'population': 'general'
         },
+        'guideline': 'https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/',
+        'recommendation': 'Use abacavir per standard dosing guidelines',
+        'strength': 'strong'
+    },
         {
-            "factors": {
-                "HLA-B*57:01": "positive"
+            'factors': {
+                'HLA-B*57:01': 'positive', 'population': 'general'
             },
-            "recommendation": "Abacavir is not recommended",
-            "strength": "strong",
-            "guideline": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/",
-            "population": "general"
-        }
-    ]
-
-
-def test_write_to_file():
-    save_json("/tmp/raw_cpic.json", create_cpic_recommendations())
+            'guideline': 'https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/',
+            'recommendation': 'Abacavir is not recommended',
+            'strength': 'strong'
+        }]
 
 
 def test_check_guideline():
     def help():
-        rec = create_cpic_recommendations()
+        rec = CPIC_RECOMMENDATIONS
         result = []
         for drugname, values in rec.items():
             guidelines = set()
@@ -147,3 +139,81 @@ def test_check_guideline():
         if i["is_drug_in_guideline_url"] == False:
             print(i["drug"])
             print(i["guidelines"])
+
+
+def test_import_parse_copy():
+    # TODO:
+    # 1. parse first line with regexp to extract table name and column names
+    # 2. parse next lines up until \. to extract data. use tsv reader
+    #    https://www.pythonpool.com/read-tsv-file-python/
+    
+    input = "COPY cpic.allele (id, version, genesymbol, name, functionalstatus, clinicalfunctionalstatus, clinicalfunctionalsubstrate, activityvalue, definitionid, citations, strength, functioncomments, findings, frequency) FROM stdin;"
+    
+    table, columns = parse_copy(input)
+    
+    assert table == "allele"
+    assert columns == ['id', 'version', 'genesymbol', 'name', 'functionalstatus', 'clinicalfunctionalstatus',
+                       'clinicalfunctionalsubstrate', 'activityvalue', 'definitionid', 'citations', 'strength',
+                       'functioncomments', 'findings', 'frequency']
+
+
+def test_yield_rows_from_sql_file():
+    database = defaultdict(list)
+    with open(os.path.join(cwd, "fixtures/cpic.sql"), 'r') as sql_file:
+        for table, row in yield_rows_from_sql_file(sql_file):
+            database[table].append(row)
+    assert dict(database) == {
+        'allele': [{
+            'activityvalue': None,
+            'citations': '{}',
+            'clinicalfunctionalstatus': 'Normal Function',
+            'clinicalfunctionalsubstrate': None,
+            'definitionid': '777262',
+            'findings': None,
+            'frequency': None,
+            'functionalstatus': None,
+            'functioncomments': None,
+            'genesymbol': 'CACNA1S',
+            'id': '777263',
+            'name': 'Reference',
+            'strength': None,
+            'version': '25'
+        },
+            {
+                'activityvalue': None,
+                'citations': '{22232210}',
+                'clinicalfunctionalstatus': 'No function',
+                'clinicalfunctionalsubstrate': None,
+                'definitionid': '1357093',
+                'findings': 'SLCO1B1*48 is assigned no function due to evidence '
+                            'supporting a partial gene deletion (22232210). '
+                            'Therefore, consensus among experts was no function '
+                            'due to limited evidence.',
+                'frequency': None,
+                'functionalstatus': None,
+                'functioncomments': None,
+                'genesymbol': 'SLCO1B1',
+                'id': '1357094',
+                'name': '*49',
+                'strength': 'Limited',
+                'version': '9'
+            }],
+        'allele_definition': [{
+            'genesymbol': 'HLA-A',
+            'id': '9000',
+            'name': '*31:01',
+            'pharmvarid': None,
+            'reference': False,
+            'structuralvariation': False,
+            'version': '1'
+        },
+            {
+                'genesymbol': 'HLA-B',
+                'id': '9001',
+                'name': '*15:02',
+                'pharmvarid': None,
+                'reference': False,
+                'structuralvariation': False,
+                'version': '1'
+            }]
+    }

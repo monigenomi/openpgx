@@ -1,132 +1,123 @@
+import csv
 import gzip
 import json
-import os
-import pickle
 import re
 from collections import defaultdict
 from typing import Optional, Any
 
 from openpgx.cpic import *
-from openpgx.helpers import index_items_by_key
-from .helpers import (
-    download_to_cache_dir,
-    normalize_hla_gene_and_factor,
-    yield_rows_from_sql_file,
-    logger
-)
+from openpgx.helpers import index_items_by_key, normalize_hla_gene_and_factor
+from .helpers import download_to_cache_dir
 
 CPIC_DEFAULT_URL = (
-    "https://github.com/cpicpgx/cpic-data/releases/download/v1.15.1/cpic_db_dump-v1.15.1_inserts.sql.gz")
-
-DATA_TABLES = [
-    'allele',
-    'allele_definition',
-    'gene',
-    'pair',
-    'guideline',
-    'drug',
-    'publication',
-    'recommendation',
-    'gene_result_diplotype',
-    'gene_result_lookup',
-    'test_alert',
-    'gene_result'
-]
-
-DATA = {}
-INDEXES = {}
+    "https://github.com/cpicpgx/cpic-data/releases/download/v1.15.1/cpic_db_dump-v1.15.1.sql.gz")
 
 
-# normalizes row from cpic database, given table name and row
-def normalize(table: str, record: dict) -> Optional[dict]:
-    if table == "recommendation":
-        if record["drugrecommendation"] == "No recommendation":
-            return None
-        
-        if record["lookupkey"]:
-            parsed_lookupkey = json.loads(record["lookupkey"])
-            for key in list(parsed_lookupkey.keys()):
-                match = re.match(r"^No (.+) result$", parsed_lookupkey[key])
-                if match:
-                    parsed_lookupkey[key] = match[1] + " n/a"
-            
-            record["lookupkey"] = parsed_lookupkey
-        else:
-            record["lookupkey"] = {}
-    
-    return record
-
-
-def load_cpic_database_from_descriptor(file):
-    global DATA, INDEXES
-    
-    # keys are table names, values are lists of records in them
-    DATA = defaultdict(list)
-    
-    for table_name, row in yield_rows_from_sql_file(file):
-        if table_name in DATA_TABLES:
-            normalized_row = normalize(table_name, row)
-            if normalized_row is not None:
-                if table_name == 'recommendation' and normalized_row['id'] == 1767274:
-                    print(row)
-                    print(normalized_row)
-                DATA[table_name].append(normalized_row)
-    
-    INDEXES = {}
-    DATA = dict(DATA)
-
-
-def load_cpic_database(sql_gz_path):
-    with gzip.open(sql_gz_path, 'rt') as file:
-        load_cpic_database_from_descriptor(file)
-
-
-def load_cpic_database_cached(cached_sql_gz: str, force: bool = False):
-    global DATA, INDEXES
-    cached_file_path = cached_sql_gz + ".pkl"
-    
-    if force or not os.path.exists(cached_file_path):
-        logger.info("Creating cached cpic database")
-        load_cpic_database(cached_sql_gz)
-        with open(cached_file_path, "wb") as cpicdb:
-            pickle.dump(DATA, cpicdb)
-            return
-    
-    logger.info("Loading cached cpic database")
-    with open(cached_file_path, "rb") as cpicdb:
-        print("loading")
-        for key, value in pickle.load(cpicdb).items():
-            DATA[key] = value
-        
-        INDEXES.clear()
-
-
-def load_cpic_database_from_url(url: str, force: bool = False):
-    cached_sql_gz = download_to_cache_dir(url)
-    load_cpic_database_cached(cached_sql_gz, force)
-
-
-def normalize_activityscore(activityscore):
+def normalize_activityscore(activityscore: str, is_for_factors: bool):
     if activityscore == "n/a" or activityscore == "No result" or activityscore is None:
         return None
-    if "≥" not in activityscore:
-        return "== " + "{0:.2f}".format(round(float(activityscore) * 4) / 4)
-    return ">= " + "{0:.2f}".format(
-        round(float(activityscore.replace("≥", "")) * 4) / 4
-    )
+    if is_for_factors:
+        if "≥" not in activityscore:
+            return "== " + "{0:.2f}".format(round(float(activityscore) * 4) / 4)
+        return ">= " + "{0:.2f}".format(
+            round(float(activityscore.replace("≥", "")) * 4) / 4
+        )
+    
+    return round(float(re.sub(r"[^\d+.]", "", activityscore)) * 4) / 4
 
 
 def normalize_cpic_factor(genename: str, factor: str) -> tuple:
     if re.match(r"≥?\d+(\.\d+)?", factor):
-        return genename, normalize_activityscore(factor)
+        return genename, normalize_activityscore(factor, True)
+    
+    if "HLA-" in genename:
+        genename, factor = normalize_hla_gene_and_factor(genename, factor)
+        return genename, factor
     
     if re.match(r"No (.*?) Result|No Result|n/a", factor):
         return genename, None
     
-    if "HLA-" in genename:
-        genename, factor = normalize_hla_gene_and_factor(genename, factor)
-    
     return genename, factor
+
+
+# normalizes record from cpic database dump
+def normalize(table: str, record: dict) -> Optional[dict]:
+    for key, value in record.items():
+        if value is not None:
+            if value == '\\N':
+                record[key] = None
+            elif value == 'f':
+                record[key] = False
+            elif value == 't':
+                record[key] = True
+            elif value[0:1] == "{":
+                try:
+                    record[key] = json.loads(value)
+                except json.JSONDecodeError:
+                    # We don't need sets like {"asdfa sdfgs","asdfas asdfa"}
+                    record[key] = None
+    
+    if table == "recommendation":
+        if record["drugrecommendation"] == "No recommendation":
+            return None
+        
+        record["lookupkey"] = normalize_cpic_factors(record["lookupkey"] or {})
+    
+    return record
+
+
+def normalize_cpic_factors(factors: dict) -> dict:
+    result = {}
+    for gene, factor in factors.items():
+        gene, factor = normalize_cpic_factor(gene, factor)
+        result[gene] = factor
+    return result
+
+
+def parse_copy(sql: str) -> dict:
+    table_name, columns = re.search(r"COPY\s+(?:(?:[^(\.]+)\.)?([^(\.]+)\s+\(([^)]+)\)\s+FROM\s+stdin", sql).groups()
+    column_names = [c.strip() for c in columns.split(r",")]
+    
+    return table_name, column_names
+
+
+def yield_rows_from_sql_file(sql_file: any):
+    table, columns, lines, reading = None, None, [], False
+    
+    for line in sql_file:
+        if re.match("\s*COPY", line):
+            table, columns = parse_copy(line)
+            reading = True
+            continue
+        
+        if line[0:2] == "\\.":
+            reading = False
+            reader = csv.DictReader(lines, fieldnames=columns, dialect='excel-tab')
+            for record in reader:
+                record = normalize(table, record)
+                if record is not None:
+                    yield table, record
+            
+            lines = []
+            continue
+        
+        if reading:
+            lines.append(line)
+
+
+def load_cpic_database_from_descriptor(file) -> dict:
+    # keys are table names, values are lists of records in them
+    data = defaultdict(list)
+    
+    for table, record in yield_rows_from_sql_file(file):
+        data[table].append(record)
+    
+    return dict(data)
+
+
+def load_cpic_dump(sql_gz_path) -> dict:
+    with gzip.open(sql_gz_path, 'rt') as file:
+        return load_cpic_database_from_descriptor(file)
 
 
 def get_alleles(allele_table: list) -> dict:
@@ -148,24 +139,6 @@ def validate_hla_genotype(genotype: str) -> str:
     return genotype
 
 
-def normalize_cpic_phenotype(phenotype: str) -> Any:
-    phenotype_lower = phenotype.lower()
-    # for item in ["normal", "intermediate", "poor"]:
-    #     if item in phenotype_lower:
-    #         return item + " metabolizer"
-    # if "rapid" in phenotype_lower:
-    #     return "ultrarapid metabolizer"
-    if "decreased" in phenotype_lower:
-        return "poor metabolizer"
-    if "negative" in phenotype_lower:
-        return "negative"
-    if "positive" in phenotype_lower:
-        return "positive"
-    if re.match(r"No (.*?) Result|No Result|n/a", phenotype):
-        return None
-    return phenotype_lower
-
-
 def normalize_genename(genename: str, genotype: str) -> str:
     if "HLA-" in genename:
         if "positive" in genotype:
@@ -179,19 +152,6 @@ def normalize_genename(genename: str, genotype: str) -> str:
 
 def diplotype_to_phenotype_allele_tables(diplotype):
     return sorted(diplotype.split("/"))
-
-
-def normalize_activityscore(activityscore: str, is_for_factors: bool):
-    if activityscore == "n/a" or activityscore == "No result" or activityscore is None:
-        return None
-    if is_for_factors:
-        if "≥" not in activityscore:
-            return "== " + "{0:.2f}".format(round(float(activityscore) * 4) / 4)
-        return ">= " + "{0:.2f}".format(
-            round(float(activityscore.replace("≥", "")) * 4) / 4
-        )
-    
-    return round(float(re.sub(r"[^\d+.]", "", activityscore)) * 4) / 4
 
 
 def collect_genotypes(genesymbol: str, factor: str, factors: dict, genotype_table: dict) -> dict:
@@ -234,49 +194,43 @@ def create_phenotype_and_activityscore_table(gene_result_diplotype_table: list, 
         if activityscore:
             activityscores = collect_genotypes(genesymbol, activityscore, activityscores, genotype_row)
         
-        phenotype = normalize_cpic_phenotype(lookup_row["result"])
+        phenotype = lookup_row["result"]
         phenotypes = collect_genotypes(genesymbol, phenotype, phenotypes, genotype_row)
     
     return construct_factors_dictionary(activityscores, "activityscore"), construct_factors_dictionary(phenotypes,
                                                                                                        "phenotype")
 
 
-def normalize_factors_for_recommendation(factors) -> dict:
-    """factor_value can be: phenotype, allele (in CPIC only HLA) or activityscore"""
+def create_cpic_database(url: Optional[str] = None) -> dict:
+    if url is None:
+        url = CPIC_DEFAULT_URL
     
-    result = {}
-    for genesymbol, factor_value in factors.items():
-        normalized_genesymbol = normalize_genename(genesymbol, factor_value)
-        if re.match(r"\d+(.[0-9])?|No Result|n/a", factor_value):
-            result[normalized_genesymbol] = normalize_activityscore(factor_value, True)
-        elif "HLA-" in genesymbol:
-            result[normalized_genesymbol] = validate_hla_genotype(factor_value)
-        else:
-            result[normalized_genesymbol] = normalize_cpic_phenotype(factor_value)
-    return result
-
-
-def create_cpic_recommendations() -> dict:
-    drug_table = DATA["drug"]
-    recommendation_table = DATA["recommendation"]
-    guideline_table = DATA["guideline"]
+    cached_sql_gz = download_to_cache_dir(url)
     
-    guideline_indexed_by_id = index_items_by_key(guideline_table, "id")
-    drug_indexed_by_id = index_items_by_key(drug_table, "drugid")
+    data = load_cpic_dump(cached_sql_gz)
+    
+    guideline_indexed_by_id = index_items_by_key(data["guideline"], "id")
+    drug_indexed_by_id = index_items_by_key(data["drug"], "drugid")
     
     dupicates = defaultdict(lambda: defaultdict(lambda: 0))
-    result = defaultdict(list)
-    for raw in recommendation_table:
+    recommendations = defaultdict(list)
+    for raw in data["recommendation"]:
         drug_name = drug_indexed_by_id[raw["drugid"]][0]["name"]
         
-        result[drug_name].append({
-            "factors": normalize_factors_for_recommendation(raw["lookupkey"]),
+        factors = raw["lookupkey"]
+        factors["population"] = raw["population"]
+        
+        recommendations[drug_name].append({
+            "factors": factors,
             "recommendation": raw["drugrecommendation"],
             "strength": raw["classification"].lower(),
-            "guideline": guideline_indexed_by_id[raw["guidelineid"]][0]["url"],
-            "population": raw["population"]
+            "guideline": guideline_indexed_by_id[raw["guidelineid"]][0]["url"]
         })
-        key = str(result[drug_name][-1])
+        key = str(recommendations[drug_name][-1])
         dupicates[drug_name][key] += 1
     
-    return dict(result)
+    recommendations = dict(recommendations)
+    
+    return {
+        "recommendations": recommendations
+    }

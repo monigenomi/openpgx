@@ -1,4 +1,3 @@
-import csv
 import json
 import os
 import re
@@ -11,8 +10,9 @@ from pathlib import Path
 from typing import Any, Tuple
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
+from io import StringIO
+from html.parser import HTMLParser
 
-import pglast
 from loguru import logger
 from termcolor import colored
 
@@ -74,62 +74,6 @@ def normalize_hla_allele(allele: str) -> str:
 
 def is_star(allele):
     return bool(re.search(r"\*\d+[A-Z]?/\*\d+[A-Z]?", allele))
-
-
-PHENOTYPE_AND_ALLELE_NORMALIZATIONS_CPIC = {
-    "Ultrarapid Metabolizer": "ultrarapid metabolizer",
-    "Rapid Metabolizer": "ultrarapid metabolizer",
-    "Likely Intermediate Metabolizer": "intermediate metabolizer",
-    "Possible Intermediate Metabolizer": "intermediate metabolizer",
-    "Intermediate Metabolizer": "intermediate metabolizer",
-    "Likely Poor Metabolizer": "poor metabolizer",
-    "Poor Metabolizer": "poor metabolizer",
-    "Normal Metabolizer": "normal metabolizer",
-    "uncertain risk of aminoglycoside-induced hearing loss": None,
-    "normal risk of aminoglycoside-induced hearing loss": None,
-    "ivacaftor responsive in CF patients": None,
-    "ivacaftor non-responsive in CF patients": None,
-    "increased risk of aminoglycoside-induced hearing loss": None,
-    "Uncertain Susceptibility": None,
-    "Malignant Hyperthermia Susceptibility": None,
-    "Variable": "variable",  # G6PD
-    "Deficient": "deficient",  # G6PD
-    "Normal": "normal",  # G6PD
-    "Decreased Function": "intermediate function",  # SLCO1B1
-    "Possible Increased Function": "intermediate function",  # SLCO1B1
-    "Possible Decreased Function": "intermediate function",  # SLCO1B1
-    "Possible Poor Function": "poor function",  # SLCO1B1
-    "Poor Function": "poor function",  # SLCO1B1
-    "Normal Function": "normal function",  # SLCO1B1
-    "Indeterminate": None,
-    # all HLA-A and HLA-B in CPIC are only genes with allele lookup method
-    "positive": "positive",
-    "negative": "negative",
-    None: None,  # "n/a" as value for HLA genes in recommendations
-}
-
-
-def get_normalizations(recommendations: dict) -> dict:
-    result = {}
-    for recommendations in recommendations.values():
-        for recommendation in recommendations:
-            for genename, factor in recommendation["factors"].items():
-                result[f"{genename}:{factor}"] = factor
-    return result
-
-
-def normalize_hla_gene_and_factor(genename: str, factor: str) -> Tuple[str, str]:
-    if "HLA-" in genename:
-        if " positive" in factor:
-            if "*" not in genename:
-                genename = genename + factor.replace(" positive", "")
-            factor = "positive"
-        if " negative" in factor:
-            if "*" not in genename:
-                genename = genename + factor.replace(" negative", "")
-            factor = "negative"
-    
-    return genename, factor
 
 
 def words_to_sentence(words):
@@ -195,13 +139,6 @@ def url_to_cache_dir(url: str) -> str:
     return parsed.hostname + os.path.dirname(parsed.path)
 
 
-def parse_copy(sql: str) -> dict:
-    table_name, columns = re.search(r"COPY\s+(?:(?:[^(\.]+)\.)?([^(\.]+)\s+\(([^)]+)\)\s+FROM\s+stdin", sql).groups()
-    column_names = [c.strip() for c in columns.split(r",")]
-    
-    return table_name, column_names
-
-
 def repository_path(path: str) -> str:
     return str(Path(__file__).joinpath('../../' + path).resolve())
 
@@ -222,10 +159,13 @@ def get_cache_dir_for_url(url: str) -> str:
 def download_to_cache_dir(url, force=False):
     if url.endswith(".zip"):
         cache_dir = get_cache_dir_for_url(url)
-        if not force and os.path.exists(cache_dir):
+        
+        if not force and len(os.listdir(cache_dir)) > 0:
             return cache_dir
+        
         with tempfile.TemporaryDirectory(prefix="openpgx") as tmpdirname:
             filename_path = path.join(tmpdirname, path.basename(url))
+            
             download_url(url, filename_path)
             
             with zipfile.ZipFile(filename_path, "r") as zip_ref:
@@ -254,44 +194,48 @@ def add_traceback(record):
     record["stacktrace"] = "\n".join(list(dict.fromkeys(tb[2:])))
 
 
-def yield_rows_from_sql_file(path: str):
-    with open(path, 'r') as sql_file:
-        table, columns, lines, reading = None, None, [], False
-        
-        for line in sql_file:
-            if re.match("\s*COPY", line):
-                table, columns = parse_copy(line)
-                reading = True
-                continue
-            
-            if line[0:2] == "\\.":
-                reading = False
-                reader = csv.DictReader(lines, fieldnames=columns, dialect='excel-tab')
-                for row in reader:
-                    for key, value in row.items():
-                        if value is not None:
-                            if value == '\\N':
-                                row[key] = None
-                            elif value[0:1] == '{"':
-                                row[key] = json.loads(value)
-                            elif value == 'f':
-                                row[key] = False
-                            elif value == 't':
-                                row[key] = True
-                            elif value[0] == "{" and "," in value:
-                                # we for now don't need sets like '{22232210}'
-                                row[key] = None
-                    
-                    yield table, row
-                
-                lines = []
-                continue
-            
-            if reading:
-                lines.append(line)
-
-
 logger.configure(
     handlers=[{"sink": lambda x: x, "format": "{line}: {message} {extra}\n{stacktrace}\n"}],
     patcher=add_traceback,
 )
+
+
+def normalize_hla_gene_and_factor(genename: str, factor: str) -> Tuple[str, str]:
+    match = re.match(r"No (.*?) Result|No Result|n/a", factor)
+    if match:
+        if match.groups()[0] is not None:
+            return genename + match.groups()[0], None
+        else:
+            return genename, None
+    
+    if " positive" in factor:
+        if "*" not in genename:
+            genename = genename + factor.replace(" positive", "")
+        factor = "positive"
+    if " negative" in factor:
+        if "*" not in genename:
+            genename = genename + factor.replace(" negative", "")
+        factor = "negative"
+    
+    return genename, factor
+
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.reset()
+        self.strict = False
+        self.convert_charrefs = True
+        self.text = StringIO()
+    
+    def handle_data(self, d):
+        self.text.write(d)
+    
+    def get_data(self):
+        return self.text.getvalue()
+
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()

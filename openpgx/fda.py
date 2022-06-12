@@ -1,8 +1,9 @@
 import re
 from collections import defaultdict
+from typing import Optional
 
 from .helpers import (
-    get_normalizations, is_star, load_json, download_to_cache_dir, normalize_hla_gene_and_factor
+    is_star, load_json, download_to_cache_dir, normalize_hla_gene_and_factor
 )
 
 STRENGTH_MAPPING = {"recommendation": "strong", "impact": "moderate", "pk": "optional"}
@@ -12,8 +13,8 @@ VARIANT_MAPPING_FDA = {
     "V433M": "*3 (rs2108622 T, V433M)",
     "521 TC": "521 TC",
     "521 CC": "521 CC",
-    "*02:01 positive": "*02:01 positive",
-    "*07:01 positive": "*07:01 positive",
+    "*02:01 positive": "positive",
+    "*07:01 positive": "positive",
 }
 
 
@@ -24,7 +25,7 @@ def read_fda_entries(fda_json_path):
 def normalize_strength(strength: str) -> str:
     if strength in STRENGTH_MAPPING:
         return STRENGTH_MAPPING[strength]
-
+    
     raise Exception(f"Unknown strength: {strength}")
 
 
@@ -32,15 +33,15 @@ def subgroup_to_factor(subgroups: str, subgroup: str) -> str:
     # *57:01 allele positive
     if " positive" in subgroup:
         return subgroup.split(" ")[0] + " positive"
-
+    
     # *57:01 allele negative
     if " negative" in subgroup:
         return subgroup.split(" ")[0] + " negative"
-
+    
     # -1639G>A variant carriers
     if "variant carrier" in subgroup:
         return VARIANT_MAPPING_FDA[subgroup.split(" ")[0]]
-
+    
     # *28/*28 (poor metabolizers)
     for possible in ["ultrarapid", "intermediate", "poor", "normal"]:
         if possible in subgroup.lower():
@@ -48,10 +49,10 @@ def subgroup_to_factor(subgroups: str, subgroup: str) -> str:
                 return possible + " metabolizer"
             if " function" in subgroups:
                 return possible + " function"
-
+    
     if is_star(subgroup):
         return None
-
+    
     return VARIANT_MAPPING_FDA[subgroup]
 
 
@@ -60,44 +61,47 @@ def subgroups_to_factors(subgroups: str) -> list:
     match = re.match(r"(.+) \((.+)\)", subgroups)
     if match:
         subgroups = " or ".join(match.groups())
-
+    
     factors = []
     for subgroup in re.split(", or | or |,", subgroups):
         factor = subgroup_to_factor(subgroups, subgroup)
         if factor:
             factors.append(factor)
-
+    
     return factors
 
 
-
+# TODO: change source to use directly https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations
+# Scrap with requests and parse with BeautifulSoup
 FDA_DEFAULT_URL = "https://raw.githubusercontent.com/PharmGKB/fda-biomarker/master/fda_pgx_associations_table.json"
 
 
-
-def get_fda_recommendations(url: str = FDA_DEFAULT_URL) -> dict:
+def create_fda_database(url: Optional[str] = None) -> dict:
+    if url is None:
+        url = FDA_DEFAULT_URL
+    
     fda_json_path = download_to_cache_dir(url)
-
+    
     entries = read_fda_entries(fda_json_path)
-
-    result = defaultdict(list)
-
+    
+    recommendations = defaultdict(list)
+    
     for entry in entries:
         for factor in subgroups_to_factors(entry["Affected Subgroups+"]):
             gene, factor = normalize_hla_gene_and_factor(entry["Gene"], factor)
             drug = entry["Drug"].lower()
-
-            result[drug].append(
+            
+            recommendations[drug].append(
                 {
-                    "factors": {gene: factor},
+                    "factors": {gene: factor, "population": "general"},
                     "recommendation": entry["Description of Gene-Drug Interaction"],
                     "strength": normalize_strength(entry["table"]),
                     "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations",
                 }
             )
-
-    return dict(result)
-
-
-def get_fda_normalizations(recommendations: dict) -> dict:
-    return get_normalizations(recommendations)
+    
+    recommendations = dict(recommendations)
+    
+    return {
+        "recommendations": recommendations
+    }

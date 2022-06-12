@@ -1,11 +1,7 @@
-import json
 import sys
-
-from typing import IO, Optional
 from argparse import ArgumentParser
 
 from . import create_database, save_database, get_recommendations
-
 from .helpers import (
     load_json,
     save_json,
@@ -32,18 +28,21 @@ if __name__ == "__main__":
     if len(command) == 0:
         help = extract_usage(repository_path('README.md'))
     
-    
     if command[0] == "update":
-        db = create_database(cpic=args["cpic"], dpwg=args["dpwg"], fda=args["fda"])
+        db = create_database(
+            cpic_url=args["cpic"],
+            dpwg_url=args["dpwg"],
+            fda_url=args["fda"]
+        )
         save_database(db)
-            
+    
     else:
         genotype = {}
         if "input" in args:
             genotype = load_json(args["genotype"])
         recommendations = get_recommendations(genotype)
         save_json(args["output"], recommendations)
-            
-    #input = load_json(args["input"])
-    #recommendations = get_recommendations(input)
-    #save_json(args["output"], recommendations)
+    
+    # input = load_json(args["input"])
+    # recommendations = get_recommendations(input)
+    # save_json(args["output"], recommendations)

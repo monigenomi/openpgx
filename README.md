@@ -59,6 +59,13 @@ $ openpgx update
        https://raw.githubusercontent.com/PharmGKB/fda-biomarker/master/fda_pgx_associations_table.json
 ```
 
+## Development
+
+Some tips:
+
+- Please add tests for each change you make
+- Recommendations database generation is best done by debugging "openpgx update" command
+
 ## License
 
 EUPL v1.2
