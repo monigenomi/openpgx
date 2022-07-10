@@ -1,8 +1,8 @@
 import sys
 from argparse import ArgumentParser
 
-from . import create_database, save_database, get_recommendations
-from .helpers import (
+from openpgx import create_database, save_database, get_recommendations
+from openpgx.helpers import (
     load_json,
     save_json,
     repository_path,

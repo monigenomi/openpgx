@@ -5,11 +5,11 @@ from typing import Optional
 
 from loguru import logger
 
-from .cpic import create_cpic_database
-from .dpwg import create_dpwg_database
-from .fda import create_fda_database
+from openpgx.cpic import create_cpic_database
+from openpgx.dpwg import create_dpwg_database
+from openpgx.fda import create_fda_database
 
-from .helpers import (
+from openpgx.helpers import (
     words_to_sentence,
     load_json, cache_path, save_json, repository_path
 )
@@ -73,14 +73,12 @@ def recommendation_matches_factors(
 
 
 def get_recommendations_for_drug(source: str, recommendations: list, factors: dict) -> dict:
-    result = {}
-    
     matched_recommendations = []
     for recommendation in recommendations:
         if recommendation_matches_factors(source, recommendation, factors):
             matched_recommendations.append(recommendation)
     if len(matched_recommendations) > 0:
-        result[source] = get_best_recommendation(matched_recommendations)
+        return get_best_recommendation(matched_recommendations)
     elif len(recommendations) > 0:
         factors_of_recommendations = set(
             [f for r in recommendations for f in r["factors"]]
@@ -89,13 +87,13 @@ def get_recommendations_for_drug(source: str, recommendations: list, factors: di
             list(factors_of_recommendations - set(factors.keys()))
         )
         if len(genes_missing) > 0:
-            result[source] = {
+            return {
                 "factors": {},
                 "recommendation": f"Recommendations are available, but they require genotypes of following genes: {words_to_sentence(genes_missing)}",
                 "guideline": recommendations[0]["guideline"],
             }
     
-    return result
+    return {}
 
 
 def create_database(*, cpic_url=None, dpwg_url=None, fda_url=None):
@@ -124,11 +122,17 @@ def save_database(data: dict) -> dict:
 def get_recommendations(genotype: dict) -> dict:
     database = load_database()
     
+    def phenotyping(genotype):
+        return genotype
     factors = phenotyping(genotype)
     
     recommendations = {}
     
     for drug in database:
-        recommendations[drug] = get_recommendations_for_drug(drug, factors)
+        cpic_recommendations = get_recommendations_for_drug("cpic", drug, factors)
+        dpwg_recommendations = get_recommendations_for_drug("dpwg", drug, factors)
+        fda_recommendations = get_recommendations_for_drug("fda", drug, factors)
+
+        recommendations[drug] = cpic_recommendations + dpwg_recommendations + fda_recommendations
     
     return recommendations

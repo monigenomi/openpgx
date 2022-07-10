@@ -6,7 +6,7 @@ from typing import Optional
 
 import bs4
 
-from .helpers import (
+from openpgx.helpers import (
     download_to_cache_dir,
     format_with_populations,
     is_star,

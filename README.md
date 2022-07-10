@@ -65,6 +65,7 @@ Some tips:
 
 - Please add tests for each change you make
 - Recommendations database generation is best done by debugging "openpgx update" command
+- It's best to use `python -m openpgx` during development as it handled module loading properly
 
 ## License
 

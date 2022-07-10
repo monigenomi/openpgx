@@ -6,8 +6,7 @@ from collections import defaultdict
 from typing import Optional, Any
 
 from openpgx.cpic import *
-from openpgx.helpers import index_items_by_key, normalize_hla_gene_and_factor
-from .helpers import download_to_cache_dir
+from openpgx.helpers import index_items_by_key, normalize_hla_gene_and_factor, download_to_cache_dir
 
 CPIC_DEFAULT_URL = (
     "https://github.com/cpicpgx/cpic-data/releases/download/v1.15.1/cpic_db_dump-v1.15.1.sql.gz")
@@ -212,7 +211,7 @@ def create_cpic_database(url: Optional[str] = None) -> dict:
     guideline_indexed_by_id = index_items_by_key(data["guideline"], "id")
     drug_indexed_by_id = index_items_by_key(data["drug"], "drugid")
     
-    dupicates = defaultdict(lambda: defaultdict(lambda: 0))
+    duplicates = defaultdict(lambda: defaultdict(lambda: 0))
     recommendations = defaultdict(list)
     for raw in data["recommendation"]:
         drug_name = drug_indexed_by_id[raw["drugid"]][0]["name"]
@@ -227,7 +226,7 @@ def create_cpic_database(url: Optional[str] = None) -> dict:
             "guideline": guideline_indexed_by_id[raw["guidelineid"]][0]["url"]
         })
         key = str(recommendations[drug_name][-1])
-        dupicates[drug_name][key] += 1
+        duplicates[drug_name][key] += 1
     
     recommendations = dict(recommendations)
     

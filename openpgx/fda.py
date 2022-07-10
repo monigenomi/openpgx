@@ -2,7 +2,7 @@ import re
 from collections import defaultdict
 from typing import Optional
 
-from .helpers import (
+from openpgx.helpers import (
     is_star, load_json, download_to_cache_dir, normalize_hla_gene_and_factor
 )
 
