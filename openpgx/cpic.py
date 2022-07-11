@@ -11,7 +11,6 @@ from openpgx.helpers import index_items_by_key, normalize_hla_gene_and_factor, d
 CPIC_DEFAULT_URL = (
     "https://github.com/cpicpgx/cpic-data/releases/download/v1.15.1/cpic_db_dump-v1.15.1.sql.gz")
 
-
 def normalize_activityscore(activityscore: str, is_for_factors: bool):
     if activityscore == "n/a" or activityscore == "No result" or activityscore is None:
         return None

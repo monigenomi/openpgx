@@ -32,14 +32,9 @@ https://github.com/monigenomi/openpgx
 
 ## Development
 
-You can setup development environment and run tests with following commands:
+You can setup development environment by running `source activate.sh`
 
-```sh
-python3 -m venv venv
-source venv/bin/activate
-pip install -e '.[dev]'
-pytest -vv
-```
+Then it's preferred that you use VSCode for development. Tests in CLI can be run with `pytest -vv`.
 
 If you wish to compute recommendations from raw databases, you can use `openpgx update` command:
 
