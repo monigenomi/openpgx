@@ -13,23 +13,20 @@ def test_get_all_recommendations():
 
 def test_get_recommendations_for_drug_HLA_ABACAVIR():
     # Abacavir exists in every base with different recommendation in each
-    assert (
-        sorted(
-            list(
-                get_recommendations_for_drug(
-                    "abacavir",
-                    {
-                        "HLA-B*57:01": {
-                            "factor": "positive",
-                            "cpic_factor": "positive",
-                            "activityscore": None,
-                        }
-                    },
-                ).keys()
-            )
+    assert sorted(
+        list(
+            get_recommendations_for_drug(
+                "abacavir",
+                {
+                    "HLA-B*57:01": {
+                        "factor": "positive",
+                        "cpic_factor": "positive",
+                        "activityscore": None,
+                    }
+                },
+            ).keys()
         )
-        == ["cpic", "dpwg", "fda"]
-    )
+    ) == ["cpic", "dpwg", "fda"]
 
 
 def test_get_recommendation_for_drug():
@@ -175,19 +172,19 @@ def test_get_recommendations_dpwg_by_activity_score():
 
 def test_compare_activity_score():
     for n in [2.0, 2]:
-        assert compare_factor("Normal Metabolizer", n, ">= 1.5") == True
-        assert compare_factor("Normal Metabolizer", n, ">= 2.0") == True
-        assert compare_factor("Normal Metabolizer", n, ">= 2") == True
-        assert compare_factor("Normal Metabolizer", n, ">= 2.5") == False
-        assert compare_factor("Normal Metabolizer", n, "== 2") == True
-        assert compare_factor("Normal Metabolizer", n, "== 2.0") == True
+        assert does_encoding_match_factor("Normal Metabolizer", n, ">= 1.5") == True
+        assert does_encoding_match_factor("Normal Metabolizer", n, ">= 2.0") == True
+        assert does_encoding_match_factor("Normal Metabolizer", n, ">= 2") == True
+        assert does_encoding_match_factor("Normal Metabolizer", n, ">= 2.5") == False
+        assert does_encoding_match_factor("Normal Metabolizer", n, "== 2") == True
+        assert does_encoding_match_factor("Normal Metabolizer", n, "== 2.0") == True
 
-    compare_factor("Normal Metabolizer", 1.0, "Normal Metabolizer") == True
-    compare_factor("*57:01 negative", 1.0, "*57:01 negative") == True
-    compare_factor("Ultra Metabolizer", 1.0, "Normal Metabolizer") == False
-    compare_factor(None, 1.0, None) == True
-    compare_factor("Ultra Metabolizer", None, None) == False
-    compare_factor(None, 1.0, "Ultra Metabolizer") == False
+    does_encoding_match_factor("Normal Metabolizer", 1.0, "Normal Metabolizer") == True
+    does_encoding_match_factor("*57:01 negative", 1.0, "*57:01 negative") == True
+    does_encoding_match_factor("Ultra Metabolizer", 1.0, "Normal Metabolizer") == False
+    does_encoding_match_factor(None, 1.0, None) == True
+    does_encoding_match_factor("Ultra Metabolizer", None, None) == False
+    does_encoding_match_factor(None, 1.0, "Ultra Metabolizer") == False
 
 
 def test_prepare_range():

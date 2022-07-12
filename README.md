@@ -4,18 +4,16 @@ OpenPGx is software with useful pharmacogenomics utilities.
 
 It now implements to convert human's genotype to phenotype and annotate with gene-drug recommendations (for all drugs having recommendations in CPIC, DPWG, or FDA pharmacogenomics databases)
 
-## Usage
+## Terminal Usage
 
-```sh
-$ openpgx recommendations --genotype <file> [--output <file>]
+```
+
+$ openpgx <input> [-o <output>]
   
-  Computes pharmacogenomics recommendations from local database.
-    
-  Options:
-    -g, --genotype JSON file with genotypes to filter recommendations
-    -o, --output   Output file location [default: recommendations.json] 
+  <input> is a path to JSON file with genotypes to filter recommendations
+  <output> is a path to where results will be put, in JSON format
   
-  An example genotype.json (under path passed using `--genotype` or `-g` flag):
+  Here is an example <input> file that describes person's genotype:
   
     {
       "SLCO1B1", "*1A/*1B",
@@ -25,12 +23,22 @@ $ openpgx recommendations --genotype <file> [--output <file>]
       "DPYD": "c.601A>C/c.2194G>A (*6)",
       "G6PD": "B (wildtype)"
     }
-  
-Thank you for using OpenPGx! We will appreciate Your feedback and contributions at:
+
+   
+Thank you for using OpenPGx! We really appreciate contrubitions and discussions:
 https://github.com/monigenomi/openpgx
+
 ```
 
-## Development
+## Python API Usage
+
+```python
+import openpgx
+
+openpgx.recommendations({ "SLCO1B1", "*1A/*1B" })
+```
+
+## Contributing
 
 You can setup development environment by running `source activate.sh`
 

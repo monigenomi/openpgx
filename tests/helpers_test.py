@@ -12,14 +12,14 @@ def test_index_table_by_something():
         ],
         "Gene",
     )
-    
+
     expected = {
         "CYP2D6": [
             {"Drug": "Tamsulosin", "Gene": "CYP2D6"},
             {"Drug": "Trimipramine", "Gene": "CYP2D6"},
         ]
     }
-    
+
     assert result == expected
 
 
@@ -47,19 +47,25 @@ def test_format_with_populations():
             "CBZ naive": {"recommendation": "world", "foo": "bar"},
         }
     ) == {
-               "recommendation": "Adults: hello\n\nIf patient has not previously used carbamazepine: world",
-               "foo": "bar",
-           }
+        "recommendation": "Adults: hello\n\nIf patient has not previously used carbamazepine: world",
+        "foo": "bar",
+    }
 
 
 def test_url_to_dir():
-    assert url_to_cache_dir("https://github.com/cpicpgx/cpic-data/releases/download/v1.10/inserts.sql.gz") == \
-           "github.com/cpicpgx/cpic-data/releases/download/v1.10"
-    assert url_to_cache_dir("https://github.com/cpicpgx/example.zip") == \
-           "github.com/cpicpgx/example"
+    assert (
+        url_to_cache_dir(
+            "https://github.com/cpicpgx/cpic-data/releases/download/v1.10/inserts.sql.gz"
+        )
+        == "github.com/cpicpgx/cpic-data/releases/download/v1.10"
+    )
+    assert (
+        url_to_cache_dir("https://github.com/cpicpgx/example.zip")
+        == "github.com/cpicpgx/example"
+    )
 
 
 def test_extract_usage():
-    usage = extract_usage(repository_path('README.md')).split("\n")
+    usage = extract_usage(repository_path("README.md")).split("\n")
     assert usage[0][0:9] == "$ openpgx"
     assert usage[-1] == "https://github.com/monigenomi/openpgx"

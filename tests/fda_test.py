@@ -8,11 +8,11 @@ def test_subgroups_to_factors():
     assert subgroups_to_factors(
         "ultrarapid, normal, intermediate, or poor metabolizers"
     ) == [
-               "ultrarapid metabolizer",
-               "normal metabolizer",
-               "intermediate metabolizer",
-               "poor metabolizer",
-           ]
+        "ultrarapid metabolizer",
+        "normal metabolizer",
+        "intermediate metabolizer",
+        "poor metabolizer",
+    ]
     assert subgroups_to_factors("intermediate or poor metabolizers") == [
         "intermediate metabolizer",
         "poor metabolizer",
@@ -39,12 +39,12 @@ def test_get_fda_recommendations():
             "factors": {"HLA-B*57:01": "positive", "population": "general"},
             "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations",
             "recommendation": "Results in higher adverse reaction risk (hypersensitivity "
-                              "reactions). Do not use abacavir in patients positive for "
-                              "HLA-B*57:01.",
+            "reactions). Do not use abacavir in patients positive for "
+            "HLA-B*57:01.",
             "strength": "strong",
         }
     ]
-    
+
     assert FDA_RECOMMENDATIONS["doxepin"] == [
         {
             "factors": {"CYP2C19": "intermediate metabolizer", "population": "general"},
@@ -77,5 +77,5 @@ def test_get_fda_recommendations():
             "strength": "optional",
         },
     ]
-    
+
     assert len(FDA_RECOMMENDATIONS) == 104

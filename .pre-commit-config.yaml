@@ -6,8 +6,8 @@ repos:
         language: python
         require_serial: true
         entry: bash -c 'isort "$@"; git add -u' --
-      - id: black
-        name: black
+      - id: format
+        name: format
         language: python
         require_serial: true
         entry: bash -c 'black "$@"; git add -u' --

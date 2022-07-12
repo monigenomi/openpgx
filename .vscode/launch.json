@@ -8,7 +8,10 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "openpgx/__main__.py",
+            "args": [
+                "update"
+            ],
             "console": "integratedTerminal",
             "justMyCode": true
         }

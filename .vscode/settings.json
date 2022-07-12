@@ -1,0 +1,4 @@
+{
+    "github.copilot.inlineSuggest.enable": false,
+    "python.formatting.provider": "black"
+}

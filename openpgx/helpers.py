@@ -17,6 +17,36 @@ from loguru import logger
 from termcolor import colored
 
 
+def repository_path(path: str) -> str:
+    return str(Path(__file__).joinpath("../../" + path).resolve())
+
+
+DATABASE_PATH = repository_path("database.json")
+DATABASE = None
+
+
+def get_database():
+    global DATABASE
+
+    if DATABASE is None:
+        load_database()
+
+    return DATABASE
+
+
+def load_database(database_path: str = DATABASE_PATH):
+    global DATABASE
+    if not os.path.exists(database_path):
+        logger.error('No database present. Please use "openpgx update".')
+
+    DATABASE = load_json(database_path)
+    return DATABASE
+
+
+def save_database(data: dict = DATABASE) -> dict:
+    save_json(DATABASE_PATH, data)
+
+
 def load_json(json_path: str) -> dict:
     with open(json_path) as f:
         return json.load(f)
@@ -30,9 +60,9 @@ def save_json(json_path: str, data: Any):
 def extract_usage(readme_path):
     with open(readme_path, "r") as f:
         contents = f.read()
-    
-    usage_section = re.search(r"(?<=## Usage)[^#]+", contents).group(0)
-    return re.search(r"(?<=```sh\n).+(?=\n```)", usage_section, re.DOTALL).group(0)
+
+    usage_section = re.search(r"(?<=## Terminal Usage)[^#]+", contents).group(0)
+    return re.search(r"(?<=```\n).+(?=\n```)", usage_section, re.DOTALL).group(0)
 
 
 def index_items_by_key(items: list, key: str) -> dict:
@@ -46,25 +76,25 @@ def with_logs(fn):
     def fn_with_logs(*args, **kwargs):
         warnings = []
         errors = []
-        
+
         def log(record):
             entry = {"message": record["message"], **record["extra"]}
-            
+
             if record["level"].name == "WARNING":
                 warnings.append(entry)
-            
+
             if record["level"].name == "ERROR":
                 errors.append(entry)
-            
+
             return False
-        
+
         handler_id = logger.add(lambda x: x, filter=log)
         result = fn(*args, **kwargs)
         result["warnings"] = warnings
         result["errors"] = errors
         logger.remove(handler_id)
         return result
-    
+
     return fn_with_logs
 
 
@@ -79,7 +109,7 @@ def is_star(allele):
 def words_to_sentence(words):
     if len(words) == 1:
         return words[0]
-    
+
     return ", ".join(words[0:-1]) + " and " + words[-1]
 
 
@@ -104,20 +134,6 @@ def _key_without_description(recommendation: dict) -> str:
     return ":::".join([f"{a}::{str(b)}" for a, b in r.items()])
 
 
-def format_with_populations(recommendations_by_population: dict) -> dict:
-    if len(recommendations_by_population) == 1:
-        return list(recommendations_by_population.values())[0]
-    
-    result = []
-    
-    for key, recommendation in recommendations_by_population.items():
-        result.append(POPULATIONS[key] + ": " + recommendation["recommendation"])
-    
-    recommendation = list(recommendations_by_population.values())[0]
-    
-    return {**recommendation, "recommendation": "\n\n".join(result)}
-
-
 # assert normalize_gene_and_factor("HLA-A*31:01", "*31:01 positive") == ("HLA-A*31:01", "positive")
 def download_url(url: str, save_path: str):
     logger.info("Downloading file", url=url, path=save_path)
@@ -139,38 +155,34 @@ def url_to_cache_dir(url: str) -> str:
     return parsed.hostname + os.path.dirname(parsed.path)
 
 
-def repository_path(path: str) -> str:
-    return str(Path(__file__).joinpath('../../' + path).resolve())
-
-
 def cache_path(path: str) -> str:
-    return repository_path('.cache/' + path)
+    return repository_path(".cache/" + path)
 
 
 def get_cache_dir_for_url(url: str) -> str:
-    cache_dir = repository_path('.cache/' + url_to_cache_dir(url))
-    
+    cache_dir = repository_path(".cache/" + url_to_cache_dir(url))
+
     if not path.exists(cache_dir):
         os.makedirs(cache_dir)
-    
+
     return cache_dir
 
 
 def download_to_cache_dir(url, force=False):
     if url.endswith(".zip"):
         cache_dir = get_cache_dir_for_url(url)
-        
+
         if not force and len(os.listdir(cache_dir)) > 0:
             return cache_dir
-        
+
         with tempfile.TemporaryDirectory(prefix="openpgx") as tmpdirname:
             filename_path = path.join(tmpdirname, path.basename(url))
-            
+
             download_url(url, filename_path)
-            
+
             with zipfile.ZipFile(filename_path, "r") as zip_ref:
                 zip_ref.extractall(cache_dir)
-            
+
             return cache_dir
     else:
         cache_dir = get_cache_dir_for_url(url)
@@ -188,14 +200,16 @@ def add_traceback(record):
         record["message"] = colored(record["message"], "yellow")
     else:
         record["message"] = record["message"]
-    
+
     tb = traceback.extract_stack()
     tb = [f"{t[1]}: {t[3]}" for t in tb[::-1] if t.filename == tb[-1].filename]
     record["stacktrace"] = "\n".join(list(dict.fromkeys(tb[2:])))
 
 
 logger.configure(
-    handlers=[{"sink": lambda x: x, "format": "{line}: {message} {extra}\n{stacktrace}\n"}],
+    handlers=[
+        {"sink": lambda x: x, "format": "{line}: {message} {extra}\n{stacktrace}\n"}
+    ],
     patcher=add_traceback,
 )
 
@@ -207,7 +221,7 @@ def normalize_hla_gene_and_factor(genename: str, factor: str) -> Tuple[str, str]
             return genename + match.groups()[0], None
         else:
             return genename, None
-    
+
     if " positive" in factor:
         if "*" not in genename:
             genename = genename + factor.replace(" positive", "")
@@ -216,7 +230,7 @@ def normalize_hla_gene_and_factor(genename: str, factor: str) -> Tuple[str, str]
         if "*" not in genename:
             genename = genename + factor.replace(" negative", "")
         factor = "negative"
-    
+
     return genename, factor
 
 
@@ -227,10 +241,10 @@ class MLStripper(HTMLParser):
         self.strict = False
         self.convert_charrefs = True
         self.text = StringIO()
-    
+
     def handle_data(self, d):
         self.text.write(d)
-    
+
     def get_data(self):
         return self.text.getvalue()
 

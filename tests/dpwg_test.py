@@ -1,7 +1,9 @@
 from openpgx.dpwg import *
 from openpgx.helpers import *
 
-DATA_DIRECTORY = "../.cache/api.pharmgkb.org/v1/download/file/data/dosingGuidelines.json/"
+DATA_DIRECTORY = (
+    "../.cache/api.pharmgkb.org/v1/download/file/data/dosingGuidelines.json/"
+)
 DPWG_RECOMMENDATIONS = create_dpwg_database()["recommendations"]
 
 
@@ -28,16 +30,16 @@ def test_therapy_table():
             base_dir, "Annotation_of_DPWG_Guideline_for_irinotecan_and_UGT1A1.json"
         )
     )
-    
+
     assert get_recommendations_by_factors(
         irinotecan["guideline"]["textMarkdown"]["html"]
     ) == {
-               "intermidiate metabolizer": "NO action is needed for this gene-drug "
-                                           "interaction.",
-               "poor metabolizer": "Start with 70% of the standard dose If the patient "
-                                   "tolerates this initial dose, the dose can be increased, "
-                                   "guided by the neutrophil count.",
-           }
+        "intermidiate metabolizer": "NO action is needed for this gene-drug "
+        "interaction.",
+        "poor metabolizer": "Start with 70% of the standard dose If the patient "
+        "tolerates this initial dose, the dose can be increased, "
+        "guided by the neutrophil count.",
+    }
     # It should be ampty because "recommendation": false
     gliclazide = load_json(
         path.join(
@@ -45,8 +47,8 @@ def test_therapy_table():
         )
     )
     assert (
-            get_recommendations_by_factors(gliclazide["guideline"]["textMarkdown"]["html"])
-            == {}
+        get_recommendations_by_factors(gliclazide["guideline"]["textMarkdown"]["html"])
+        == {}
     )
 
 
@@ -58,12 +60,12 @@ def test_message_for_no_recommendations():
 def test_load_dpwg_entry():
     base_dir = path.join(path.dirname(path.realpath(__file__)), DATA_DIRECTORY)
     assert (
-            load_dpwg_entry(
-                path.join(
-                    base_dir, "Annotation_of_DPWG_Guideline_for_ribavirin_and_HLA_B.json"
-                )
-            )["recommendations_by_factor"]
-            == {}
+        load_dpwg_entry(
+            path.join(
+                base_dir, "Annotation_of_DPWG_Guideline_for_ribavirin_and_HLA_B.json"
+            )
+        )["recommendations_by_factor"]
+        == {}
     )
 
 
@@ -78,27 +80,29 @@ def test_get_dpwg_recommendations():
             "factors": {"UGT1A1": "poor metabolizer", "population": "adults"},
             "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104951",
             "recommendation": "Start with 70% of the standard dose If the patient "
-                              "tolerates this initial dose, the dose can be increased, "
-                              "guided by the neutrophil count.",
+            "tolerates this initial dose, the dose can be increased, "
+            "guided by the neutrophil count.",
         },
     ]
-    assert DPWG_RECOMMENDATIONS["ribavirin"] == [{
-        'factors': {"population": "adults"},
-        'guideline': 'https://pharmgkb.org/guidelineAnnotation/PA166104947',
-        'recommendation': 'Although there is some evidence for lower treatment '
-                          'response in HLA-B*44 negative patients,  there are no '
-                          'dosing recommendations for ribavirin at this time.\n'
-    }]
-    
+    assert DPWG_RECOMMENDATIONS["ribavirin"] == [
+        {
+            "factors": {"population": "adults"},
+            "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104947",
+            "recommendation": "Although there is some evidence for lower treatment "
+            "response in HLA-B*44 negative patients,  there are no "
+            "dosing recommendations for ribavirin at this time.\n",
+        }
+    ]
+
     assert DPWG_RECOMMENDATIONS["abacavir"] == [
         {
             "factors": {"HLA-B*57:01": "positive", "population": "adults"},
             "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104991",
             "recommendation": "Abacavir is contra-indicated for HLA-B*5701-positive "
-                              "patients.1. Avoid abacavir.",
+            "patients.1. Avoid abacavir.",
         }
     ]
-    
+
     # TODO: assert DPWG_RECOMMENDATIONS["carbamazepine"] == []
     # TODO: assert DPWG_RECOMMENDATIONS["rasburicase"] == [] .... only cpic?
     # TODO: warfarin... it should include CYP4F2 as factor

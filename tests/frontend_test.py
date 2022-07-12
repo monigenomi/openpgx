@@ -12,7 +12,6 @@
 #     assert result['max_values'] == 2
 #     assert result['min_values'] == 1
 
-
 # def test_fda_records_hla():
 #     assert single_database_records(
 #         [{"allele": "*57:01", "gene": "HLA-B", "variant": "positive"}]
@@ -39,7 +38,6 @@
 #             "input": "select",
 #         },
 #     ]
-
 
 # def test_gene_with_2_alleles():
 #     assert single_database_records(

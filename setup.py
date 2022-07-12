@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
-from pathlib import Path  # noqa E402
+from pathlib import Path
+from click import style  # noqa E402
 
 from setuptools import setup
 
@@ -57,7 +58,7 @@ package(
     ],
     extras_require={
         "dev": [
-            "black==21.8b0",
+            "black==22.6.0",
             "pre-commit",
             "pylint",
             "pytest",
