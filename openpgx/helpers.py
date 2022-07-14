@@ -213,7 +213,7 @@ logger.configure(
     patcher=add_traceback,
 )
 
-
+# ("HLA-B", "*57:01 positive") => ("HLA-B*57:01", "positive")
 def normalize_hla_gene_and_factor(genename: str, factor: str) -> Tuple[str, str]:
     match = re.match(r"No (.*?) Result|No Result|n/a", factor)
     if match:

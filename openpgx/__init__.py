@@ -5,12 +5,19 @@ from collections import defaultdict
 from typing import Optional
 
 from loguru import logger
+from numpy import source
 
 from openpgx.cpic import create_cpic_database
 from openpgx.dpwg import create_dpwg_database
 from openpgx.fda import create_fda_database
 
 from openpgx.helpers import words_to_sentence, get_database
+
+DATABASES = {
+    "cpic": create_cpic_database,
+    "dpwg": create_dpwg_database,
+    "fda": create_fda_database,
+}
 
 
 def index_recommendations(all_recommendations: list) -> dict:
@@ -52,65 +59,70 @@ def recommendation_matches_genotype(recommendation: dict, genotype: dict) -> boo
         if gene not in genotype:
             return False
 
+        if factor is None:
+            return False
+
         if not does_encoding_match_factor(genotype[gene], factor):
             return False
 
     return True
 
 
-def get_recommendations_for_drug(drug: str, genotype: str) -> dict:
+def get_recommendation_for_drug(database: dict, drug: str, genotype: str):
+    if drug not in database["recommendations"]:
+        return None
+
+    drug_recommendations = database["recommendations"][drug]
+
+    matched_recommendations = []
+
+    for recommendation in drug_recommendations:
+        if recommendation_matches_genotype(recommendation, genotype):
+            matched_recommendations.append(recommendation)
+
+    if len(matched_recommendations) > 0:
+        recommendation = get_best_recommendation(matched_recommendations)
+
+        return recommendation
+
+    return None
+
+
+def verify_vendor_database(data):
+    recommendation_gene_names = data.keys()
+    recommendation_factor_names = [d["factors"] for d in data.values()]
+
+
+def create_database(sources):
     result = {}
-    database = get_database()
 
-    drug_recommendations = database[drug]
-
-    for source, recommendations in drug_recommendations.items():
-        matched_recommendations = []
-
-        for recommendation in recommendations:
-            if recommendation_matches_genotype(recommendation, genotype):
-                matched_recommendations.append(recommendation)
-
-        if len(matched_recommendations) > 0:
-            result[source] = get_best_recommendation(matched_recommendations)
-
-        elif len(recommendations) > 0:
-            factors_of_recommendations = set(
-                [f for r in recommendations for f in r["factors"]]
-            )
-            genes_missing = sorted(
-                list(factors_of_recommendations - set(genotype.keys()))
-            )
-            if len(genes_missing) > 0:
-                result[source] = {
-                    "factors": {},
-                    "recommendation": f"Recommendations are available, but they require genotypes of following genes: {words_to_sentence(genes_missing)}",
-                    "guideline": recommendations[0]["guideline"],
-                }
+    for source, source_url in sources.items():
+        result[source] = DATABASES[source](source_url)
 
     return result
 
 
-def create_database(*, cpic_url=None, dpwg_url=None, fda_url=None):
-    result = {}
-
-    result["cpic"] = create_cpic_database(cpic_url)
-    result["dpwg"] = create_dpwg_database(dpwg_url)
-    result["fda"] = create_fda_database(fda_url)
-
-    return result
+def get_drugs(database) -> list:
+    drugs = []
+    for source_database in database.values():
+        drugs.extend(source_database["recommendations"].keys())
+    return drugs
 
 
 def get_recommendations(genotype: dict) -> dict:
-    result = {}
+    recommendations = defaultdict(dict)
 
     database = get_database()
 
-    for drug in database:
-        cpic_recommendations = get_recommendations_for_drug(drug, genotype)
-        dpwg_recommendations = get_recommendations_for_drug(drug, genotype)
-        fda_recommendations = get_recommendations_for_drug(drug, genotype)
+    drugs = get_drugs(database)
 
-        result[drug] = cpic_recommendations + dpwg_recommendations + fda_recommendations
+    for source, source_database in database.items():
+        for drug in drugs:
+            recommendation = get_recommendation_for_drug(
+                source_database, drug, genotype
+            )
 
-    return result
+            if recommendation != None:
+                recommendations[drug].append(recommendation)
+
+    return dict(recommendations)

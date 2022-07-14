@@ -92,32 +92,32 @@ def test_normalize_activityscore():
     assert normalize_activityscore("≥4", False) == 4.00
 
 
-def test_create_phenotype_and_activityscore_table():
-    activityscore, phenotype = create_phenotype_and_activityscore_table(
-        DATA["gene_result_diplotype"], DATA["gene_result_lookup"], DATA["gene_result"]
-    )
+# def test_create_phenotype_and_activityscore_table():
+#     activityscore, phenotype = create_phenotype_and_activityscore_table(
+#         DATA["gene_result_diplotype"], DATA["gene_result_lookup"], DATA["gene_result"]
+#     )
 
-    activity_two = [i for i in activityscore["CYP2C9"] if i["activityscore"] == 2.00][0]
-    assert activity_two == {
-        "activityscore": 2.0,
-        "genotypes": [["*1", "*1"], ["*9", "*9"], ["*1", "*9"]],
-    }
-    assert phenotype["CACNA1S"][0] == {
-        "genotypes": [
-            ["c.3257G>A", "c.3257G>A"],
-            ["c.520C>T", "c.520C>T"],
-            ["Reference", "c.520C>T"],
-            ["Reference", "c.3257G>A"],
-            ["c.3257G>A", "c.520C>T"],
-        ],
-        "phenotype": "Malignant Hyperthermia Susceptibility",
-    }
+#     activity_two = [i for i in activityscore["CYP2C9"] if i["activityscore"] == 2.00][0]
+#     assert activity_two == {
+#         "activityscore": 2.0,
+#         "genotypes": [["*1", "*1"], ["*9", "*9"], ["*1", "*9"]],
+#     }
+#     assert phenotype["CACNA1S"][0] == {
+#         "genotypes": [
+#             ["c.3257G>A", "c.3257G>A"],
+#             ["c.520C>T", "c.520C>T"],
+#             ["Reference", "c.520C>T"],
+#             ["Reference", "c.3257G>A"],
+#             ["c.3257G>A", "c.520C>T"],
+#         ],
+#         "phenotype": "Malignant Hyperthermia Susceptibility",
+#     }
 
-    # assert [i for i in phenotype["HLA-B*15:02"] if i["phenotype"] == "negative"] == {
-    #     # TODO - maybe it should have different format?
-    #     "phenotype": "negative",
-    #     "genotypes": [["negative"]],
-    # }
+#     # assert [i for i in phenotype["HLA-B*15:02"] if i["phenotype"] == "negative"] == {
+#     #     # TODO - maybe it should have different format?
+#     #     "phenotype": "negative",
+#     #     "genotypes": [["negative"]],
+#     # }
 
 
 def test_normalize_cpic_factors():

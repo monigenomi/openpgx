@@ -5,12 +5,23 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Update Database",
             "type": "python",
             "request": "launch",
             "program": "openpgx/__main__.py",
             "args": [
                 "update"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Get Recommendations",
+            "type": "python",
+            "request": "launch",
+            "program": "openpgx/__main__.py",
+            "args": [
+                "genotype.json"
             ],
             "console": "integratedTerminal",
             "justMyCode": true
