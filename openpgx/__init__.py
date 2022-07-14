@@ -62,7 +62,7 @@ def get_recommendations_for_drug(drug: str, genotype: str) -> dict:
     result = {}
     database = get_database()
 
-    drug_recommendations = database[drug]["recommendations"]
+    drug_recommendations = database[drug]
 
     for source, recommendations in drug_recommendations.items():
         matched_recommendations = []

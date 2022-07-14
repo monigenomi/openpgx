@@ -209,9 +209,10 @@ def create_phenotype_and_activityscore_table(
         phenotype = lookup_row["result"]
         phenotypes = collect_genotypes(genesymbol, phenotype, phenotypes, genotype_row)
 
-    return construct_factors_dictionary(
-        activityscores, "activityscore"
-    ), construct_factors_dictionary(phenotypes, "phenotype")
+    return {
+        "activityscores": construct_factors_dictionary(activityscores, "activityscore"),
+        "phenotypes": construct_factors_dictionary(phenotypes, "phenotype")
+    }
 
 
 def create_cpic_database(url: Optional[str] = None) -> dict:
@@ -243,9 +244,7 @@ def create_cpic_database(url: Optional[str] = None) -> dict:
             }
         )
 
-    for allele in data["allele"]:
-        encodings[allele["genesymbol"]].append(allele["name"])
 
-    encodings = {k: sorted(list(v)) for k, v in encodings.items()}
+    encodings = create_phenotype_and_activityscore_table(data["gene_result_diplotype"], data["gene_result_lookup"], data["gene_result"])
 
-    return {"recommendations": dict(recommendations), "encodings": dict(encodings)}
+    return {"recommendations": dict(recommendations), "encodings": encodings}

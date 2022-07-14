@@ -1,6 +1,10 @@
 from openpgx import *
 
 
+def test_create_database():
+    create_database()
+
+
 def test_get_all_drugs():
     drugs = get_all_drugs()
     assert len(set(["doxepin", "abacavir", "rasburicase"]) & drugs) == 3
