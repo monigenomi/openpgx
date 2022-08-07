@@ -1,25 +1,37 @@
 from openpgx import *
 
+database = get_database()
 
-def test_create_database():
-    create_database()
-
+# def test_create_database():
+#     create_database(cpic_url=args["cpic"], dpwg_url=args["dpwg"], fda_url=args["fda"])
+#     #TODO create this test. This is only for "update" option in main function
 
 def test_get_all_drugs():
-    drugs = get_all_drugs()
-    assert len(set(["doxepin", "abacavir", "rasburicase"]) & drugs) == 3
-    assert len(drugs) == 139
+    drugs = get_drugs(database)
+    assert len(drugs) == 253
 
 
-def test_get_all_recommendations():
-    assert get_all_recommendations() == []
+def test_recommendation_matches_genotype():
+    
+    assert recommendation_matches_genotype({
+        'factors': {
+            'HLA-B*57:01': 'negative', 'population': 'general'
+            },
+        'recommendation': 'Use abacavir per standard dosing guidelines',
+        'strength': 'strong',
+        'guideline': 'https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/'
+        },{
+        "HLA-B*57:01": {
+            "factor": "negtive",
+            "cpic_factor": "negative",
+            "activityscore": None,
+        }}) == True
 
 
 def test_get_recommendations_for_drug_HLA_ABACAVIR():
     # Abacavir exists in every base with different recommendation in each
-    assert sorted(
-        list(
-            get_recommendations_for_drug(
+    assert get_recommendation_for_drug(
+                database["cpic"],
                 "abacavir",
                 {
                     "HLA-B*57:01": {
@@ -28,27 +40,25 @@ def test_get_recommendations_for_drug_HLA_ABACAVIR():
                         "activityscore": None,
                     }
                 },
-            ).keys()
-        )
-    ) == ["cpic", "dpwg", "fda"]
+            ) == []
 
 
 def test_get_recommendation_for_drug():
-    assert get_recommendations_for_drug("allopurinol", {}) == {
-        "cpic": {
+    assert get_recommendation_for_drug(database["cpic"], "allopurinol", {}) == {
             "factors": {},
             "guideline": "https://cpicpgx.org/guidelines/guideline-for-allopurinol-and-hla-b/",
             "recommendation": "Recommendations are available, but they require "
             "genotypes of following genes: HLA-B*58:01",
         },
-        "fda": {
+
+
+       assert get_recommendation_for_drug(database[ "fda"], "allopurinol", {}) == {
             "factors": {},
             "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations",
             "recommendation": "Recommendations are available, but they require "
             "genotypes of following genes: HLA-B*58:01",
-        },
-    }
-    assert get_recommendations_for_drug(
+        }
+    assert get_recommendatios_for_drug(
         "allopurinol", phenotyping({"HLA-B*58:01": "positive"})
     ) == {
         "cpic": {

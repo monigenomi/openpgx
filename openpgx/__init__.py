@@ -40,7 +40,14 @@ def get_best_recommendation(recommendations: list) -> dict:
     return max(recommendations, key=score)
 
 
+
 def does_encoding_match_factor(encoding: str, factor: str) -> bool:
+    """
+    Checks if encoding matches factor
+
+    factor is a range for which encoding matches factor, e.g. ">= 2.0"
+    encoding is the value of factor, e.g. "5.25"
+    """
     # Case with activity score: "== 2.00" and ">= 2.00"
     factor_operator, factor_value = factor[0:2], factor[2:]
     if factor_operator == "==":
@@ -56,7 +63,7 @@ def recommendation_matches_genotype(recommendation: dict, genotype: dict) -> boo
         return len(recommendation["factors"]) == 0
 
     for gene, factor in recommendation["factors"].items():
-        if gene not in genotype:
+        if gene not in genotype.keys():
             return False
 
         if factor is None:
@@ -94,6 +101,7 @@ def verify_vendor_database(data):
 
 
 def create_database(sources):
+    # TODO make default sources
     result = {}
 
     for source, source_url in sources.items():
