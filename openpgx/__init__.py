@@ -14,9 +14,9 @@ from openpgx.fda import create_fda_database
 from openpgx.helpers import words_to_sentence, get_database
 
 DATABASES = {
-    "cpic": create_cpic_database,
-    "dpwg": create_dpwg_database,
-    "fda": create_fda_database,
+    "cpic": create_cpic_database(),
+    "dpwg": create_dpwg_database(),
+    "fda": create_fda_database(),
 }
 
 
@@ -45,7 +45,7 @@ def does_encoding_match_factor(encoding: str, factor: str) -> bool:
     """
     Checks if encoding matches factor
 
-    encoding is the value of factor, e.g. "5.25", "poor metabilizer", "positive"
+    encoding is the value of factor, e.g. "== 5.25", "poor metabilizer", "positive"
     factor is:
         - activity score: a range for which encoding matches factor, e.g. ">= 2.0"
         or
@@ -144,12 +144,12 @@ def verify_vendor_database(data):
     recommendation_factor_names = [d["factors"] for d in data.values()]
 
 
-def create_database(sources):
+def create_database():
     # TODO make default sources
     result = {}
 
-    for source, source_url in sources.items():
-        result[source] = DATABASES[source](source_url)
+    for data in ["cpic", "dpwg", "fda"]:
+        result[data] = DATABASES[data]
 
     return result
 
@@ -160,23 +160,49 @@ def get_drugs(database) -> list:
         drugs.extend(source_database["recommendations"].keys())
     return drugs
 
-
-def get_recommendations_for_person(genotype: dict) -> dict:
+def phenotyping(genotypes: dict, database: dict ) -> dict:
     """
-    1. Creates database with all databases data (cpic, fda, dpwg)
-    2. Creates recommendation dictionary for each drug in database. Recommedation matches genotype
+    Performs translation, changing genotype to encoding according to encodings taken from databases.
+    genotype: according to main input example.json
+    database: dictionary with databases names as keys (cpic, fda, dpwg) and "recommendations" and "encodings"
+    """
+    cpic_encodings = database["cpic"]["encodings"] #TODO implement encodings from DPWG and FDA also
+    phenotyping_result = {}
+    for gene, genotype in genotypes.items():
+        sorted_genotype = "/".join(sorted(genotype.split("/")))
+        encoding = cpic_encodings[gene][sorted_genotype]
+        phenotyping_result[gene] = [normalize_pjenotype(i) for i in encoding]
+    return phenotyping_result
+    
+def get_recommendations_for_patient(genotypes: dict) -> dict:
+    """
+    1. Creates database with all databases data (cpic, fda, dpwg). Including recommendations + encodings for each
+    2. Performs phenotyping (using encodings). Example:
+        "encodings": {"NUDT15": {
+            "*1/*1": [
+              "normal metabolizer"
+            ],
+            "*1/*3": [
+              "intermediate metabolizer"
+            ]}
+    2. Creates recommendation dictionary for each drug in database
+        if genotype translated to encoding matches factors in recomendation
 
+    genotype: dictionary with all genes that were genotyped for specific patient, according to example.json
     """
     recommendations = defaultdict(dict)
 
     database = get_database()
 
     drugs = get_drugs(database)
+    
+    genotypes_translated_to_encodings = phenotyping(genotypes)
 
+    
     for source, source_database in database.items():
         for drug in drugs:
             recommendation = get_recommendation_for_drug(
-                source_database, drug, genotype
+                source_database, drug, genotypes
             )
 
             if recommendation != None:

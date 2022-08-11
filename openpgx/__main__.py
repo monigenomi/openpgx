@@ -1,7 +1,7 @@
 import sys
 from argparse import ArgumentParser
 
-from openpgx import create_database, get_recommendations_for_person
+from openpgx import create_database, get_recommendations_for_patient, DATABASES
 from openpgx.helpers import (
     load_json,
     save_json,
@@ -23,19 +23,12 @@ def main(args: dict):
     command = args["positional"][0]
 
     if command == "update":
-        db = create_database(
-            cpic_url=args["cpic"], dpwg_url=args["dpwg"], fda_url=args["fda"]
-        )
-        save_database(db)
+        save_database(DATABASES)
 
     else:
         genotype = load_json(args["positional"][0])
-        recommendations = get_recommendations_for_person(genotype)
+        recommendations = get_recommendations_for_patient(genotype)
         save_json(args["output"], recommendations)
-
-    # input = load_json(args["input"])
-    # recommendations = get_recommendations(input)
-    # save_json(args["output"], recommendations)
 
 
 if __name__ == "__main__":

@@ -34,7 +34,16 @@ def get_database():
     return DATABASE
 
 
+def load_json(json_path: str) -> dict:
+    with open(json_path) as f:
+        return json.load(f)
+
+
 def load_database(database_path: str = DATABASE_PATH):
+    """
+    Loads database from json (database.json) if exists already in repository.
+    """
+    
     global DATABASE
     if not os.path.exists(database_path):
         logger.error('No database present. Please use "openpgx update".')
@@ -43,18 +52,15 @@ def load_database(database_path: str = DATABASE_PATH):
     return DATABASE
 
 
-def save_database(data: dict = DATABASE) -> dict:
-    save_json(DATABASE_PATH, data)
-
-
-def load_json(json_path: str) -> dict:
-    with open(json_path) as f:
-        return json.load(f)
-
-
 def save_json(json_path: str, data: Any):
     with open(json_path, "w") as f:
         return json.dump(data, f, indent=2)
+
+
+def save_database(data: dict = DATABASE) -> dict:
+    "Writes database to json file after using option openpgx update"
+    save_json(DATABASE_PATH, data)
+
 
 
 def extract_usage(readme_path):
