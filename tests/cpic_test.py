@@ -11,9 +11,6 @@ cwd = os.path.dirname(os.path.realpath(__file__))
 
 cached_sql_gz = download_to_cache_dir(CPIC_DEFAULT_URL)
 
-DATA = load_cpic_dump(cached_sql_gz)
-
-
 def test_get_alleles():
     assert get_alleles(
         [
@@ -91,10 +88,6 @@ def test_normalize_activityscore():
     assert normalize_activityscore("> 1.5", False) == 1.50
     assert normalize_activityscore("≥4", False) == 4.00
 
-
-
-def test_create_cpic_database():
-    assert create_cpic_database() == []
 
 # def test_create_phenotype_and_activityscore_table():
 #     activityscore, phenotype = create_phenotype_and_activityscore_table(
@@ -216,62 +209,54 @@ def test_yield_rows_from_sql_file():
     with open(os.path.join(cwd, "fixtures/cpic.sql"), "r") as sql_file:
         for table, row in yield_rows_from_sql_file(sql_file):
             database[table].append(row)
-    assert dict(database) == {
-        "allele": [
-            {
-                "activityvalue": None,
-                "citations": "{}",
-                "clinicalfunctionalstatus": "Normal Function",
-                "clinicalfunctionalsubstrate": None,
-                "definitionid": "777262",
-                "findings": None,
-                "frequency": None,
-                "functionalstatus": None,
-                "functioncomments": None,
-                "genesymbol": "CACNA1S",
-                "id": "777263",
-                "name": "Reference",
-                "strength": None,
-                "version": "25",
-            },
-            {
-                "activityvalue": None,
-                "citations": "{22232210}",
-                "clinicalfunctionalstatus": "No function",
-                "clinicalfunctionalsubstrate": None,
-                "definitionid": "1357093",
-                "findings": "SLCO1B1*48 is assigned no function due to evidence "
-                "supporting a partial gene deletion (22232210). "
-                "Therefore, consensus among experts was no function "
-                "due to limited evidence.",
-                "frequency": None,
-                "functionalstatus": None,
-                "functioncomments": None,
-                "genesymbol": "SLCO1B1",
-                "id": "1357094",
-                "name": "*49",
-                "strength": "Limited",
-                "version": "9",
-            },
-        ],
-        "allele_definition": [
-            {
-                "genesymbol": "HLA-A",
-                "id": "9000",
-                "name": "*31:01",
-                "pharmvarid": None,
-                "reference": False,
-                "structuralvariation": False,
-                "version": "1",
-            },
-            {
-                "genesymbol": "HLA-B",
-                "id": "9001",
-                "name": "*15:02",
-                "pharmvarid": None,
-                "reference": False,
-                "structuralvariation": False,
-                "version": "1",
-            },
-        ],
-    }
+    assert dict(database) == {'allele': [{'activityvalue': None,
+                 'citations': {},
+                 'clinicalfunctionalstatus': 'Normal Function',
+                 'clinicalfunctionalsubstrate': None,
+                 'definitionid': '777262',
+                 'findings': None,
+                 'frequency': None,
+                 'functionalstatus': None,
+                 'functioncomments': None,
+                 'genesymbol': 'CACNA1S',
+                 'id': '777263',
+                 'name': 'Reference',
+                 'strength': None,
+                 'version': '25'},
+                {'activityvalue': None,
+                 'citations': None,
+                 'clinicalfunctionalstatus': 'No function',
+                 'clinicalfunctionalsubstrate': None,
+                 'definitionid': '1357093',
+                 'findings': 'SLCO1B1*48 is assigned no function due to evidence '
+                             'supporting a partial gene deletion (22232210). '
+                             'Therefore, consensus among experts was no function '
+                             'due to limited evidence.',
+                 'frequency': {'African American/Afro-Caribbean': None,
+                               'American': None,
+                               'Central/South Asian': None,
+                               'East Asian': None,
+                               'European': None,
+                               'Near Eastern': None,
+                               'Sub-Saharan African': None},
+                 'functionalstatus': None,
+                 'functioncomments': None,
+                 'genesymbol': 'SLCO1B1',
+                 'id': '1357094',
+                 'name': '*49',
+                 'strength': 'Limited',
+                 'version': '9'}],
+     'allele_definition': [{'genesymbol': 'HLA-A',
+                            'id': '9000',
+                            'name': '*31:01',
+                            'pharmvarid': None,
+                            'reference': False,
+                            'structuralvariation': False,
+                            'version': '1'},
+                           {'genesymbol': 'HLA-B',
+                            'id': '9001',
+                            'name': '*15:02',
+                            'pharmvarid': None,
+                            'reference': False,
+                            'structuralvariation': False,
+                            'version': '1'}]}

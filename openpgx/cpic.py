@@ -18,6 +18,10 @@ CPIC_DEFAULT_URL = "https://github.com/cpicpgx/cpic-data/releases/download/v1.15
 def normalize_activityscore(activityscore: str, is_for_factors: bool):
     if activityscore == "n/a" or activityscore == "No result" or activityscore is None:
         return None
+    # Check if activityscore is as. If is genotype or phenotype - return this
+    if not any(char.isdigit() for char in activityscore):
+        return activityscore
+    
     if is_for_factors:
         if "≥" not in activityscore:
             return "== " + "{0:.2f}".format(round(float(activityscore) * 4) / 4)
@@ -37,7 +41,7 @@ def normalize_cpic_factor(genename: str, factor: str) -> tuple:
             factor = None
 
         if factor:
-            factor = factor.lower()
+            factor = normalize_activityscore(factor.lower(), True)
 
     return genename, factor
 
@@ -154,7 +158,7 @@ def normalize_genename(genename: str, genotype: str) -> str:
     return genename
 
 
-def create_encodings(data) -> dict:
+def create_cpic_encodings(data) -> dict:
     result = defaultdict(lambda: defaultdict(list))
 
     indexed_gene_result_lookup = index_items_by_key(data["gene_result_lookup"], "id")
@@ -180,7 +184,12 @@ def create_encodings(data) -> dict:
     return {k: dict(v) for k, v in result.items()}
 
 
-def create_recommendations(data):
+def create_cpic_recommendations(data: dict) -> dict:
+    """
+    Creates dictionary with all cpic data needed to match recommendation for every drug existing in database.
+    data:
+        authomaticly created dictionary from sql file. Each key corresponds to sql table name
+    """
     guideline_indexed_by_id = index_items_by_key(data["guideline"], "id")
     drug_indexed_by_id = index_items_by_key(data["drug"], "drugid")
 
@@ -210,7 +219,7 @@ def create_cpic_database(url: Optional[str] = None) -> dict:
 
     cached_sql_gz = download_to_cache_dir(url)
     data = load_cpic_dump(cached_sql_gz)
-    recommendations = create_recommendations(data)
-    encodings = create_encodings(data)
+    recommendations = create_cpic_recommendations(data)
+    encodings = create_cpic_encodings(data)
 
     return {"recommendations": recommendations, "encodings": encodings}
