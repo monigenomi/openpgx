@@ -45,26 +45,53 @@ def does_encoding_match_factor(encoding: str, factor: str) -> bool:
     """
     Checks if encoding matches factor
 
-    factor is a range for which encoding matches factor, e.g. ">= 2.0"
-    encoding is the value of factor, e.g. "5.25"
+    encoding is the value of factor, e.g. "5.25", "poor metabilizer", "positive"
+    factor is:
+        - activity score: a range for which encoding matches factor, e.g. ">= 2.0"
+        or
+        - phenotype
+        or
+        - genotype (in HLA cases)
+    
     """
-    # Case with activity score: "== 2.00" and ">= 2.00"
-    factor_operator, factor_value = factor[0:2], factor[2:]
-    if factor_operator == "==":
-        return float(encoding) == float(factor_value)
-    elif factor_operator == ">=":
-        return float(encoding) >= float(factor_value)
+    # activity score: "== 2.00" and ">= 2.00"
+    if '= ' in encoding:
+        factor_operator, factor_value = factor[0:2], factor[2:]
+        if factor_operator == "==":
+            return float(encoding) == float(factor_value)
+        elif factor_operator == ">=":
+            return float(encoding) >= float(factor_value)
 
+    # In factors other than activity score (phenotype, genotype)
     return encoding == factor
 
 
+
 def recommendation_matches_genotype(recommendation: dict, genotype: dict) -> bool:
+    """
+    Checks if all factors for specific drug z
+    Usage:
+
+    - recommendation["factors"]
+      dictionary for specific drug, where keys are factor names and values are allowed factor range values:
+      for example:
+        {
+            'HLA-B*57:01': 'negative',
+            # 'population': 'general'
+            }
+    - genotype
+        dictionary where key is genename and value is genotype (haplotype or diplotype)
+        for example: 
+            {'CYP2D6': '*1/*1'}
+
+    
+    """
     if len(genotype) == 0:
         return len(recommendation["factors"]) == 0
 
     for gene, factor in recommendation["factors"].items():
         if gene not in genotype.keys():
-            return False
+            return False # filter out other factors than genes (example: population)
 
         if factor is None:
             return False
@@ -76,6 +103,23 @@ def recommendation_matches_genotype(recommendation: dict, genotype: dict) -> boo
 
 
 def get_recommendation_for_drug(database: dict, drug: str, genotype: str):
+    """
+    Gets best matched recommention for specific drug in specific database (cpic, dpwd, fda)
+    database:
+        for example:
+    {
+        'recommendations': {
+            'abacavir': {
+                'factors': {'HLA-B*57:01': 'negative', 'population': 'general'},
+                'recommendation': 'Use abacavir per standard dosing guidelines',
+                'strength': 'strong',
+                'guideline': 'https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/'
+                    },
+                'allopurinol': [...]
+                },
+        "encodings" : {...}
+    
+    """
     if drug not in database["recommendations"]:
         return None
 
@@ -117,7 +161,12 @@ def get_drugs(database) -> list:
     return drugs
 
 
-def get_recommendations(genotype: dict) -> dict:
+def get_recommendations_for_person(genotype: dict) -> dict:
+    """
+    1. Creates database with all databases data (cpic, fda, dpwg)
+    2. Creates recommendation dictionary for each drug in database. Recommedation matches genotype
+
+    """
     recommendations = defaultdict(dict)
 
     database = get_database()

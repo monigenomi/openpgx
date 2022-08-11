@@ -21,11 +21,9 @@ def test_recommendation_matches_genotype():
         'strength': 'strong',
         'guideline': 'https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/'
         },{
-        "HLA-B*57:01": {
-            "factor": "negtive",
-            "cpic_factor": "negative",
-            "activityscore": None,
-        }}) == True
+        "HLA-B*57:01": "negative",
+        "population": "general"
+        }) == True
 
 
 def test_get_recommendations_for_drug_HLA_ABACAVIR():
@@ -34,11 +32,7 @@ def test_get_recommendations_for_drug_HLA_ABACAVIR():
                 database["cpic"],
                 "abacavir",
                 {
-                    "HLA-B*57:01": {
-                        "factor": "positive",
-                        "cpic_factor": "positive",
-                        "activityscore": None,
-                    }
+                    "HLA-B*57:01": "positive"
                 },
             ) == []
 
@@ -49,15 +43,15 @@ def test_get_recommendation_for_drug():
             "guideline": "https://cpicpgx.org/guidelines/guideline-for-allopurinol-and-hla-b/",
             "recommendation": "Recommendations are available, but they require "
             "genotypes of following genes: HLA-B*58:01",
-        },
-
-
-       assert get_recommendation_for_drug(database[ "fda"], "allopurinol", {}) == {
-            "factors": {},
-            "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations",
-            "recommendation": "Recommendations are available, but they require "
-            "genotypes of following genes: HLA-B*58:01",
         }
+
+
+    assert get_recommendation_for_drug(database[ "fda"], "allopurinol", {}) == {
+        "factors": {},
+        "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations",
+        "recommendation": "Recommendations are available, but they require "
+        "genotypes of following genes: HLA-B*58:01",
+    }
     assert get_recommendatios_for_drug(
         "allopurinol", phenotyping({"HLA-B*58:01": "positive"})
     ) == {
@@ -156,7 +150,7 @@ def test_phenotyping():
 
 def test_get_recommendations_CYPS():
     # Test if "multiple gene" factors works
-    recommendations = get_recommendations({"CYP2D6": "*7/*7", "CYP2C19": "*1/*2"})
+    recommendations = get_recommendations_for_person({"CYP2D6": "*7/*7", "CYP2C19": "*1/*2"})
 
     assert recommendations["trimipramine"]["cpic"] == {
         "factors": {"CYP2D6": "== 0.00", "CYP2C19": "Intermediate Metabolizer"},
@@ -167,7 +161,7 @@ def test_get_recommendations_CYPS():
 
 
 def test_get_recommendations_with_multiple_factors():
-    recommendations = get_recommendations(
+    recommendations = get_recommendations_for_person(
         {"HLA-A*31:01": "positive", "HLA-B*15:02": "negative"}
     )
     assert recommendations["carbamazepine"]["cpic"] == {
@@ -180,7 +174,7 @@ def test_get_recommendations_with_multiple_factors():
 
 
 def test_get_recommendations_dpwg_by_activity_score():
-    recommendations = get_recommendations({"DPYD": "c.601A>C/c.2194G>A (*6)"})
+    recommendations = get_recommendations_for_person({"DPYD": "c.601A>C/c.2194G>A (*6)"})
     assert recommendations["capecitabine"]["dpwg"]["factors"] == {"DPYD": "== 1.00"}
 
 

@@ -182,9 +182,9 @@ def load_dpwg_entry(gene_drug_filename: str) -> dict:
         "recommendations_by_factor": recommendations_by_factor,
         "guideline": guideline,
         "summary": gene_drug_dict["guideline"]["summaryMarkdown"]["html"],
-        "population": "general"
-        if gene_drug_dict["guideline"]["pediatric"]
-        else "adults",
+        # "population": "general"
+        # if gene_drug_dict["guideline"]["pediatric"]
+        # else "adults",
     }
 
 
@@ -220,7 +220,9 @@ def create_dpwg_database(url: Optional[str] = None) -> dict:
             ):
                 recommendations[drug_name].append(
                     {
-                        "factors": {"population": "adults"},
+                        "factors": {
+                            #"population": "adults"
+                            },
                         "recommendation": "No action is needed for this gene-drug interaction",
                         "guideline": drug_data["guideline"],
                     }
@@ -228,7 +230,9 @@ def create_dpwg_database(url: Optional[str] = None) -> dict:
             else:
                 recommendations[drug_name].append(
                     {
-                        "factors": {"population": "adults"},
+                        "factors": {
+                            #"population": "adults"
+                            },
                         "recommendation": strip_tags(drug_data["summary"]),
                         "guideline": drug_data["guideline"],
                     }
@@ -249,7 +253,7 @@ def create_dpwg_database(url: Optional[str] = None) -> dict:
                 {
                     "factors": {
                         gene_name: factor,
-                        "population": drug_data["population"],
+                        # "population": drug_data["population"],
                     },
                     "recommendation": recommendation,
                     "guideline": drug_data["guideline"].replace(

@@ -190,7 +190,7 @@ def create_recommendations(data):
         drug_recommendations = recommendations[drug_name]
 
         factors = raw["lookupkey"]
-        factors["population"] = raw["population"]
+        # factors["population"] = raw["population"]
 
         drug_recommendations.append(
             {

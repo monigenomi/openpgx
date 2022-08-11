@@ -1,7 +1,7 @@
 import sys
 from argparse import ArgumentParser
 
-from openpgx import create_database, get_recommendations
+from openpgx import create_database, get_recommendations_for_person
 from openpgx.helpers import (
     load_json,
     save_json,
@@ -30,7 +30,7 @@ def main(args: dict):
 
     else:
         genotype = load_json(args["positional"][0])
-        recommendations = get_recommendations(genotype)
+        recommendations = get_recommendations_for_person(genotype)
         save_json(args["output"], recommendations)
 
     # input = load_json(args["input"])

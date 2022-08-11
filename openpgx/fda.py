@@ -98,7 +98,10 @@ def create_fda_database(url: Optional[str] = None) -> dict:
 
             recommendations[drug].append(
                 {
-                    "factors": {gene: factor, "population": "general"},
+                    "factors": {
+                        gene: factor,
+                        # "population": "general",
+                        },
                     "recommendation": entry["Description of Gene-Drug Interaction"],
                     "strength": normalize_strength(entry["table"]),
                     "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations",

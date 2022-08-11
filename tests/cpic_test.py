@@ -92,6 +92,10 @@ def test_normalize_activityscore():
     assert normalize_activityscore("≥4", False) == 4.00
 
 
+
+def test_create_cpic_database():
+    assert create_cpic_database() == []
+
 # def test_create_phenotype_and_activityscore_table():
 #     activityscore, phenotype = create_phenotype_and_activityscore_table(
 #         DATA["gene_result_diplotype"], DATA["gene_result_lookup"], DATA["gene_result"]
@@ -130,13 +134,19 @@ def test_normalize_cpic_factors():
 def test_create_cpic_recommendations():
     assert CPIC_RECOMMENDATIONS["abacavir"] == [
         {
-            "factors": {"HLA-B*57:01": "negative", "population": "general"},
+            "factors": {
+                "HLA-B*57:01": "negative",
+                #"population": "general"
+                },
             "guideline": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/",
             "recommendation": "Use abacavir per standard dosing guidelines",
             "strength": "strong",
         },
         {
-            "factors": {"HLA-B*57:01": "positive", "population": "general"},
+            "factors": {
+                "HLA-B*57:01": "positive",
+                #"population": "general"
+                },
             "guideline": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/",
             "recommendation": "Abacavir is not recommended",
             "strength": "strong",
