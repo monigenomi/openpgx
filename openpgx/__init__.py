@@ -102,7 +102,7 @@ def recommendation_matches_genotype(recommendation: dict, genotype: dict) -> boo
     return True
 
 
-def get_recommendation_for_drug(database: dict, drug: str, genotype: str):
+def get_recommendation_for_drug(database: dict, drug: str, encodings: str):
     """
     Gets best matched recommention for specific drug in specific database (cpic, dpwd, fda)
     database:
@@ -117,7 +117,7 @@ def get_recommendation_for_drug(database: dict, drug: str, genotype: str):
                     },
                 'allopurinol': [...]
                 },
-        "encodings" : {...}
+        "encodings" : {"CYP2D6": ["poor metabolizer", 0.0, ...}
     
     """
     if drug not in database["recommendations"]:
@@ -128,7 +128,7 @@ def get_recommendation_for_drug(database: dict, drug: str, genotype: str):
     matched_recommendations = []
 
     for recommendation in drug_recommendations:
-        if recommendation_matches_genotype(recommendation, genotype):
+        if recommendation_matches_genotype(recommendation, encodings):
             matched_recommendations.append(recommendation)
 
     if len(matched_recommendations) > 0:
@@ -170,9 +170,11 @@ def phenotyping(genotypes: dict, database: dict ) -> dict:
     phenotyping_result = {}
     for gene, genotype in genotypes.items():
         sorted_genotype = "/".join(sorted(genotype.split("/")))
-        encoding = cpic_encodings[gene][sorted_genotype]
-        phenotyping_result[gene] = [normalize_pjenotype(i) for i in encoding]
+        phenotyping_result[gene] = []
+        if gene in cpic_encodings and sorted_genotype in cpic_encodings[gene]:
+            phenotyping_result[gene] = cpic_encodings[gene][sorted_genotype]
     return phenotyping_result
+    
     
 def get_recommendations_for_patient(genotypes: dict) -> dict:
     """
@@ -196,16 +198,17 @@ def get_recommendations_for_patient(genotypes: dict) -> dict:
 
     drugs = get_drugs(database)
     
-    genotypes_translated_to_encodings = phenotyping(genotypes)
+    genotypes_translated_to_encodings = phenotyping(genotypes, database)
 
     
     for source, source_database in database.items():
         for drug in drugs:
+            recommendations[drug] == defaultdict(dict)
             recommendation = get_recommendation_for_drug(
-                source_database, drug, genotypes
+                source_database, drug, genotypes_translated_to_encodings
             )
 
             if recommendation != None:
-                recommendations[drug].append(recommendation)
+                recommendations[drug][source] = recommendation
 
     return dict(recommendations)

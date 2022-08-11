@@ -50,6 +50,8 @@ def normalize_cpic_factors(factors: dict) -> dict:
     result = {}
     for gene, factor in factors.items():
         gene, factor = normalize_cpic_factor(gene, factor)
+        if factor:
+            factor = factor.lower()
         result[gene] = factor
     return result
 
@@ -157,6 +159,18 @@ def normalize_genename(genename: str, genotype: str) -> str:
                 genename = (genename + genotype.replace("negative", "")).strip()
     return genename
 
+def normalize_phenotype(phenotype: str) -> str:
+    """
+    Translates CPIC specific phenotypes to phenotypes that can be recognised by other databases. For example:
+    "possible poor matabolizer" in CPIC needs to be provided as "poor metabolizer" to other databases
+    """
+    for i in ["normal", "poor", "rapid", "intermediate"]:
+        if i in phenotype.lower().strip():
+            if i == "rapid":
+                return "ultrarapid metabolizer"
+            return i + " metabolizer"
+    return phenotype.lower()
+    
 
 def create_cpic_encodings(data) -> dict:
     result = defaultdict(lambda: defaultdict(list))
@@ -175,6 +189,11 @@ def create_cpic_encodings(data) -> dict:
             genename, gene_result["result"]
         )
         result[normalized_genename][diplotype].append(factor)
+        
+        # Later add normalized name for phenotype, to be compatible with other databases
+        normalized = normalize_phenotype(factor)
+        if normalized != factor:
+            result[normalized_genename][diplotype].append(normalize_phenotype(factor)) # Do not duplicate foactor
 
         # Then optionally gene can be represented by an activity score
         activityscore = normalize_activityscore(gene_result["activityscore"], False)
