@@ -156,7 +156,7 @@ def test_get_recommendations_CYPS():
     recommendations = get_recommendations_for_patient({"CYP2D6": "*7/*7", "CYP2C19": "*1/*2"})
 
     assert recommendations["trimipramine"]["cpic"] == {
-        "factors": {"CYP2D6": "== 0.00", "CYP2C19": "Intermediate Metabolizer"},
+        "factors": {"CYP2D6": "== 0.00", "CYP2C19": "intermediate metabolizer"},
         "recommendation": "Avoid trimipramine use. If a trimipramine is warranted, consider a 50% reduction of recommended starting dose. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
         "strength": "optional",
         "guideline": "https://cpicpgx.org/guidelines/guideline-for-tricyclic-antidepressants-and-cyp2d6-and-cyp2c19/",

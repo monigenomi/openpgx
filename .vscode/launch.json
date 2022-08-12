@@ -8,21 +8,18 @@
             "name": "Update Database",
             "type": "python",
             "request": "launch",
-            "program": "openpgx/__main__.py",
-            "args": [
-                "update"
-            ],
+            "module": "openpgx",
+            "args": ["update"],
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": true,
+            
         },
         {
             "name": "Get Recommendations",
             "type": "python",
             "request": "launch",
-            "program": "openpgx/__main__.py",
-            "args": [
-                "genotype.json"
-            ],
+            "module": "openpgx",
+            "args": ["genotype.json"],
             "console": "integratedTerminal",
             "justMyCode": true
         }

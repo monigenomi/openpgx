@@ -38,11 +38,15 @@ import openpgx
 openpgx.recommendations({ "SLCO1B1", "*1A/*1B" })
 ```
 
-## Contributing
+## Development
 
-You can setup development environment by running `source activate.sh`
+Create virtual environment and install dependencies with:
 
-Then it's preferred that you use VSCode for development. Tests in CLI can be run with `pytest -vv`.
+```
+bash setup.sh
+```
+
+Then it's recommended that you use VSCode for development. Tests in CLI can be run with `pytest -vv`.
 
 If you wish to compute recommendations from raw databases, you can use `openpgx update` command:
 
@@ -62,13 +66,11 @@ $ openpgx update
        https://raw.githubusercontent.com/PharmGKB/fda-biomarker/master/fda_pgx_associations_table.json
 ```
 
-## Development
-
 Some tips:
 
 - Please add tests for each change you make
-- Recommendations database generation is best done by debugging "openpgx update" command
-- It's best to use `python -m openpgx` during development as it handled module loading properly
+- Recommendations database generation can be created with `openpgx update` command
+- It's best to use `python -m openpgx` during development to handle module loading properly
 
 ## License
 

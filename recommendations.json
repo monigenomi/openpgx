@@ -1,1 +1,1231 @@
-{}
+{
+  "abacavir": {},
+  "allopurinol": {},
+  "amikacin": {},
+  "gentamicin": {},
+  "kanamycin": {},
+  "paromomycin": {},
+  "plazomicin": {},
+  "streptomycin": {},
+  "tobramycin": {},
+  "amitriptyline": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00",
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Avoid amitriptyline use. If a amitripyline is warranted, consider a 50% reduction of recommended starting dose. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+      "strength": "optional",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-tricyclic-antidepressants-and-cyp2d6-and-cyp2c19/"
+    },
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Use 70% of the standard dose and monitor the effect and side effects or the plasma concentrations of amitriptyline and nortriptyline to adjust the maintenance dose",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104982"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "May alter systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "codeine": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00"
+      },
+      "recommendation": "Avoid codeine use because of possibility of diminished analgesia. If opioid use is warranted, consider a non-tramadol opioid.",
+      "strength": "strong",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-codeine-and-cyp2d6/"
+    },
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "For COUGH:1. No action required.\u00a0For PAIN:It is not possible to offer adequately substantiated advice for dose adjustment based on the limited available literature for this phenotype.1. Choose an alternative.Do not select tramadol, as this is also metabolised by CYP2D6. Morphine is not metabolised by CYP2D6. Oxycodone is metabolised by CYP2D6 to a limited extent, but this does not result in differences in analgesia in patients.2. If an alternative is not an option: advise the patient to report inadequate analgesia.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104970"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in lower systemic active metabolite concentrations and may result in reduced efficacy.",
+      "strength": "moderate",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "citalopram": {
+    "cpic": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Initiate therapy with recommended starting dose",
+      "strength": "strong",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-selective-serotonin-reuptake-inhibitors-and-cyp2d6-and-cyp2c19/"
+    }
+  },
+  "tamoxifen": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00"
+      },
+      "recommendation": "Recommend alternative hormonal therapy such as an aromatase inhibitor for postmenopausal women or aromatase inhibitor along with ovarian function suppression in premenopausal women given that these approaches are superior to tamoxifen regardless of CYP2D6 genotype (PMID 26211827) and based on knowledge that CYP2D6 poor metabolizers switched from tamoxifen to anastrozole do not have an increased risk of recurrence (PMID 23213055). Note, higher dose tamoxifen (40 mg/day) increases but does not normalize endoxifen concentrations and can be considered if there are contraindications to aromatase inhibitor therapy (PMID 27226358, 21768473).",
+      "strength": "strong",
+      "guideline": "https://cpicpgx.org/guidelines/cpic-guideline-for-tamoxifen-based-on-cyp2d6-genotype/"
+    },
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Select an alternative or increase the dose to 40 mg/day and monitor the endoxifen concentration. Studies have demonstrated that PM can achieve an adequate endoxifen concentration when the dose is increased to 40-60 mg/day. Aromatase inhibitors are a possible alternative for post-menopausal women.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104966"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in lower systemic active metabolite concentrations. The impact of CYP2D6 intermediate or poor metabolism on efficacy is not well established.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "tramadol": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00"
+      },
+      "recommendation": "Avoid tramadol use because of possibility of diminished analgesia. If opioid use is warranted, consider a non-codeine opioid.",
+      "strength": "strong",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-codeine-and-cyp2d6/"
+    },
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "It is not possible to provide a recommendation for dose adjustment, because the total analgesic effect changes when the ratio between the mother compound and the active metabolite changes.1. be alert to a reduced effectiveness2. in the case of inadequate effectiveness:a. try a dose increase.b. if this does not work: choose an alternative Do not select codeine, as this is also metabolised by CYP2D6. Morphine is not metabolised by CYP2D6. Oxycodone is metabolised by CYP2D6 to a limited extent, but this does not result in differences in analgesia in patients.3. if no alternative is selected: advise the patient to report inadequate analgesia.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104959"
+    }
+  },
+  "atazanavir": {},
+  "atomoxetine": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00"
+      },
+      "recommendation": "Initiate with a dose of 0.5 mg/kg/day and if no clinical response and in the absence of adverse events after 2 weeks, consider obtaining a plasma concentration 4 hours after dosing. If response is inadequate and concentration is < 200 ng/mL, consider a proportional dose increase to achieve a concentration to approach 400 ng/mL. If unacceptable side effects are present at any time, consider a reduction in dose.",
+      "strength": "strong",
+      "guideline": "https://cpicpgx.org/guidelines/cpic-guideline-for-atomoxetine-based-on-cyp2d6-genotype/"
+    },
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "1. Start with the normal initial dose, bearing in mind that an increase in this dose probably will not be required.2. Advise the patient to seek contact if side effects occur (such as decreased appetite, vomiting, abdominal pain, constipation, insomnia, early waking, drowsiness, irritability, pupil dilation and itching).3. If the medicine is effective, but side effects occur: reduce the dose and check whether the effect is conserved. The plasma concentration of atomoxetine is a factor of 8-11 times higher for PM than for EM at the same dose.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104989"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations and higher adverse reaction risk. Adjust titration interval and increase dosage if tolerated. Refer to FDA labeling for specific dosing recommendations.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "atorvastatin": {},
+  "azathioprine": {},
+  "clomipramine": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00",
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Avoid clomipramine use. If a clomipramine is warranted, consider a 50% reduction of recommended starting dose. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+      "strength": "optional",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-tricyclic-antidepressants-and-cyp2d6-and-cyp2c19/"
+    },
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Indication DEPRESSION: use 50% of the standard dose and monitor the effect and side effects or the plasma concentrations of clomipramine and desmethylclomipramine in order to set the maintenance dose. The therapeutic range is 200-400 ng/mL for the sum of the plasma concentrations of clomipramine and desmethylclomipramine. Values higher than 600 ng/mL are considered toxic. Indication ANXIETY DISORDERS or OBSESSIVE COMPULSIVE DISORDER: if side effects occur: use 50% of the standard dose and monitor the effect and side effects or the plasma concentrations of clomipramine and desmethylclomipramine in order to set the maintenance dose. It is not known whether it is possible to reduce the dose to such an extent that the side effects disappear while the effectiveness is retained. Clomipramine and desmethylclomipramine both contribute to the side effects. Only clomipramine contributes to the effectiveness. For anxiety disorders, the therapeutic plasma concentration of clomipramine is approximately 100 ng/mL, in combination with a plasma concentration of desmethylclomipramine lower than 200 ng/mL. For obsessive compulsive disorder, the therapeutic plasma concentration of clomipramine is higher than 200 ng/mL, in combination with a plasma concentration of desmethylclomipramine that is as low as possible. A sum of the plasma concentrations of clomipramine and desmethylclomipramine higher than 600 ng/mL is considered toxic, whilst the therapeutic upper limit for depression is 400 ng/mL. If dose reduction does not have the desired effect: avoid clomipramine. Antidepressants that are not metabolised by CYP2D6, or to a lesser extent, include citalopram and sertraline.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104964"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "May alter systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "ibuprofen": {},
+  "carbamazepine": {},
+  "celecoxib": {},
+  "flurbiprofen": {},
+  "lornoxicam": {},
+  "escitalopram": {
+    "cpic": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Initiate therapy with recommended starting dose",
+      "strength": "strong",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-selective-serotonin-reuptake-inhibitors-and-cyp2d6-and-cyp2c19/"
+    },
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for citalopram/escitalopram based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182817"
+    },
+    "fda": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "May alter systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "clopidogrel": {
+    "cpic": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Avoid standard dose (75 mg) clopidogrel if possible. Use prasugrel or ticagrelor at standard dose if no contraindication.",
+      "strength": "strong",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-clopidogrel-and-cyp2c19/"
+    },
+    "fda": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Results in lower systemic active metabolite concentrations, lower antiplatelet response, and may result in higher cardiovascular risk. Consider use of another platelet P2Y12 inhibitor.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "desflurane": {},
+  "enflurane": {},
+  "desipramine": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00"
+      },
+      "recommendation": "Avoid tricyclic use due to potential for side effects. Consider alternative drug not metabolized by CYP2D6. If a TCA is warranted, consider a 50% reduction of recommended starting dose. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects. Utilize therapeutic drug monitoring to guide dose adjustments.",
+      "strength": "optional",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-tricyclic-antidepressants-and-cyp2d6-and-cyp2c19/"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "May alter systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "halothane": {},
+  "doxepin": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00",
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Avoid doxepin use. If a doxepin is warranted, consider a 50% reduction of recommended starting dose. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+      "strength": "optional",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-tricyclic-antidepressants-and-cyp2d6-and-cyp2c19/"
+    },
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Use 40% of the standard dose and monitor the effect and side effects or the plasma concentrations of doxepin and nordoxepin in order to set the maintenance dose. The therapeutic range is 100-250 ng/mL for the sum of doxepin and nordoxepin plasma concentrations. Values higher than 400 ng/mL are considered toxic.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104994"
+    },
+    "fda": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "isoflurane": {},
+  "methoxyflurane": {},
+  "sevoflurane": {},
+  "succinylcholine": {},
+  "dexlansoprazole": {
+    "cpic": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Initiate standard starting daily dose. For chronic therapy (>12 weeks) and efficacy achieved, consider 50% reduction in daily dose and monitor for continued efficacy.",
+      "strength": "optional",
+      "guideline": "https://cpicpgx.org/guidelines/cpic-guideline-for-proton-pump-inhibitors-and-cyp2c19/"
+    },
+    "fda": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "fluvoxamine": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00"
+      },
+      "recommendation": "Consider a 25-50% reduction of recommended starting dose and titrate to response or use an alternative drug not metabolized by CYP2D6.",
+      "strength": "optional",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-selective-serotonin-reuptake-inhibitors-and-cyp2d6-and-cyp2c19/"
+    },
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for fluvoxamine based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182813"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations. Use with caution.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "fluvastatin": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no recommendations for fluvastatin dosing based on SLCO1B1 genotypes.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182845"
+    }
+  },
+  "efavirenz": {},
+  "fluorouracil": {},
+  "capecitabine": {},
+  "hydrocodone": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00"
+      },
+      "recommendation": "Use hydrocodone label recommended age- or weight-specific dosing. If no response and opioid use is warranted, consider non-codeine and non-tramadol opioid.",
+      "strength": "optional",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-codeine-and-cyp2d6/"
+    }
+  },
+  "imipramine": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00",
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Avoid imipramine use. If a imipramine is warranted, consider a 50% reduction of recommended starting dose. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+      "strength": "optional",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-tricyclic-antidepressants-and-cyp2d6-and-cyp2c19/"
+    },
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Use 30% of the standard dose and monitor the effect and side effects or the plasma concentrations of imipramine and desipramine in order to set the maintenance dose. The therapeutic range is 150-300 ng/mL for the sum of the imipramine and desipramine plasma concentrations. Values exceeding 500 ng/mL are considered toxic.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104972"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "May alter systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "meloxicam": {},
+  "ivacaftor": {},
+  "lovastatin": {},
+  "paroxetine": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00"
+      },
+      "recommendation": "Select alternative drug not predominantly metabolized by CYP2D6 or if paroxetine use warranted, consider a 50% reduction of recommended starting dose and titrate to response.",
+      "strength": "optional",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-selective-serotonin-reuptake-inhibitors-and-cyp2d6-and-cyp2c19/"
+    },
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "NO action is needed for this gene-drug interaction.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104976"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "May alter systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "mercaptopurine": {},
+  "nortriptyline": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00"
+      },
+      "recommendation": "Avoid tricyclic use due to potential for side effects. Consider alternative drug not metabolized by CYP2D6. If a tricyclic antidepressant is warranted, consider a 50% reduction of recommended starting dose. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects. Utilize therapeutic drug monitoring to guide dose adjustments.",
+      "strength": "strong",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-tricyclic-antidepressants-and-cyp2d6-and-cyp2c19/"
+    },
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Use 40% of the standard dose and monitor the effect and side effects or the plasma concentration of nortriptyline in order to set the maintenance dose.The therapeutic range of nortriptyline is 50-150 ng/mL. Values exceeding 250 ng/mL are considered toxic.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104961"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "May alter systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "omeprazole": {
+    "cpic": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Initiate standard starting daily dose. For chronic therapy (>12 weeks) and efficacy achieved, consider 50% reduction in daily dose and monitor for continued efficacy.",
+      "strength": "optional",
+      "guideline": "https://cpicpgx.org/guidelines/cpic-guideline-for-proton-pump-inhibitors-and-cyp2c19/"
+    },
+    "fda": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "lansoprazole": {
+    "cpic": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Initiate standard starting daily dose. For chronic therapy (>12 weeks) and efficacy achieved, consider 50% reduction in daily dose and monitor for continued efficacy.",
+      "strength": "optional",
+      "guideline": "https://cpicpgx.org/guidelines/cpic-guideline-for-proton-pump-inhibitors-and-cyp2c19/"
+    }
+  },
+  "pantoprazole": {
+    "cpic": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Initiate standard starting daily dose. For chronic therapy (>12 weeks) and efficacy achieved, consider 50% reduction in daily dose and monitor for continued efficacy.",
+      "strength": "optional",
+      "guideline": "https://cpicpgx.org/guidelines/cpic-guideline-for-proton-pump-inhibitors-and-cyp2c19/"
+    }
+  },
+  "ondansetron": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00"
+      },
+      "recommendation": "Insufficient evidence demonstrating clinical impact based on CYP2D6 genotype. Initiate therapy with recommended starting dose.",
+      "strength": "no recommendation",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-ondansetron-and-tropisetron-and-cyp2d6-genotype/"
+    }
+  },
+  "tropisetron": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00"
+      },
+      "recommendation": "Insufficient evidence demonstrating clinical impact based on CYP2D6 genotype. Initiate therapy with recommended starting dose.",
+      "strength": "no recommendation",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-ondansetron-and-tropisetron-and-cyp2d6-genotype/"
+    }
+  },
+  "oxcarbazepine": {},
+  "phenytoin": {},
+  "fosphenytoin": {},
+  "piroxicam": {},
+  "pitavastatin": {},
+  "sertraline": {
+    "cpic": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Initiate therapy with recommended starting dose",
+      "strength": "strong",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-selective-serotonin-reuptake-inhibitors-and-cyp2d6-and-cyp2c19/"
+    },
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for sertraline based on CYP2D6 genotypes.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182821"
+    }
+  },
+  "pravastatin": {},
+  "rasburicase": {},
+  "rosuvastatin": {},
+  "simvastatin": {},
+  "tacrolimus": {},
+  "tenoxicam": {},
+  "thioguanine": {},
+  "trimipramine": {
+    "cpic": {
+      "factors": {
+        "CYP2D6": "== 0.00",
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Avoid trimipramine use. If a trimipramine is warranted, consider a 50% reduction of recommended starting dose. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+      "strength": "optional",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-tricyclic-antidepressants-and-cyp2d6-and-cyp2c19/"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "May alter systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "voriconazole": {
+    "cpic": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Initiate therapy with recommended standard of care dosing",
+      "strength": "moderate",
+      "guideline": "https://cpicpgx.org/guidelines/guideline-for-voriconazole-and-cyp2c19/"
+    },
+    "fda": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations and may result in higher adverse reaction risk.",
+      "strength": "moderate",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "eliglustat": {
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "- Co-medication with a STRONG CYP3A INHIBITOR (for example ketoconazole, clarithromycin, itraconazole, cobicistat, indinavir, lopinavir, ritonavir, saquinavir, telaprevir, tipranavir, posaconazole, voriconazole, telithromycin, conivaptan, boceprevir): Eliglustat is contra-indicated.1. Choose an alternative if possible.\u00a0- Co-medication with a MODERATE CYP3A INHIBITOR (for example erythromycin, ciprofloxacin, fluconazole, diltiazem, verapamil, aprepitant, atazanavir, darunavir, fosamprenavir, imatinib, cimetidine): Eliglustat is not recommended.1. Choose an alternative if possible.\u00a0- Co-medication with a WEAK CYP3A INHIBITOR (for example amlopidine, cilostazole, fluvoxamine, goldenseal, isoniazide, ranitidine, ranolazine):1. Choose an alternative for the weak CYP3A inhibitor if possible.2. If an alternative is not an option: Use a dose of 84mg eliglustat 1x daily and be alert to side effects.\u00a0- Co-medication with a STRONG CYP3A INDUCER (for example rifampicin, carbamazepine, phenobarbital, phenytoin, rifabutine, hypericum): Eliglustat is not recommended. The plasma concentration may decrease so sharply that a therapeutic effect cannot be achieved.1. Choose an alternative if possible.\u00a0- NO co-medication with a CYP3A inhibitor or strong CYP3A inducer:1. Use a dose of 84mg 1x daily.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166182823"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Alters systemic concentrations, effectiveness, and adverse reaction risk (QT prolongation). Indicated for normal, intermediate, and poor metabolizer patients. Ultrarapid metabolizers may not achieve adequate concentrations to achieve a therapeutic effect. The recommended dosages are based on CYP2D6 metabolizer status. Coadministration with strong CYP3A inhibitors is contraindicated in intermediate and poor CYP2D6 metabolizers. Refer to FDA labeling for specific dosing recommendations.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "phenprocoumon": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no recommendations for phenprocoumon dosing based on CYP2C9 genotypes.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166105004"
+    }
+  },
+  "flucloxacillin": {},
+  "ticagrelor": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for ticagrelor based on CYP2C19 genotypes.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182807"
+    }
+  },
+  "irinotecan": {},
+  "olanzapine": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for olanzapine based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104946"
+    }
+  },
+  "ribavirin": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "Although there is some evidence for lower treatment response in HLA-B*44 negative patients,  there are no dosing recommendations for ribavirin at this time.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104947"
+    }
+  },
+  "warfarin": {},
+  "fluoxetine": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for fluoxetine based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182852"
+    }
+  },
+  "carvedilol": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for carvedilol based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104974"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations and higher adverse reaction risk (dizziness).",
+      "strength": "moderate",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "mirtazapine": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for mirtazapine based on CYP2C19 genotypes.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182805"
+    }
+  },
+  "gefitinib": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for gefitinib based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182809"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations and higher adverse reaction risk. Monitor for adverse reactions.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "moclobemide": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "No action is needed for this gene-drug interaction.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104941"
+    }
+  },
+  "duloxetine": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for duloxetine based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104942"
+    }
+  },
+  "oxycodone": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for oxycodone based on CYP2D6 genotypes.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104973"
+    }
+  },
+  "flecainide": {
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "1. reduce the dose to 50% of the standard dose and record an ECG and monitor the plasma concentration.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104969"
+    }
+  },
+  "flupenthixol": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for flupenthixol based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104981"
+    }
+  },
+  "quetiapine": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for quetiapine based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182854"
+    }
+  },
+  "metoprolol": {
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "If a GRADUAL REDUCTION in HEART RATE is desired, or in the event of SYMPTOMATIC BRADYCARDIA: 1. increase the dose in smaller steps and/or prescribe no more than 25% of the standard dose. OTHER CASES: 1. no action required",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104995"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "tolbutamide": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for tolbutamide based on CYP2C9 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104986"
+    }
+  },
+  "acenocoumarol": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no recommendations for acenocoumarol dosing based on CYP2C9 genotypes.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104979"
+    }
+  },
+  "propafenone": {
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Reduce the dose to 30% of the standard dose, perform an ECG and monitor plasma concentrations.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104962"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations and higher adverse reaction risk (arrhythmia). Avoid use in poor metabolizers taking a CYP3A4 inhibitor.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "rabeprazole": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "No action is needed for this gene-drug interaction.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104985"
+    }
+  },
+  "gliclazide": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for gliclazide based on CYP2C9 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104971"
+    }
+  },
+  "prasugrel": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for prasugrel based on CYP2C19 genotypes.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182820"
+    }
+  },
+  "glimepiride": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for glimepiride based on CYP2C9 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104978"
+    }
+  },
+  "venlafaxine": {
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "It is not possible to offer adequately substantiated advice for dose reduction based on the literature.- avoid venlafaxine.  Antidepressants that are not metabolised by CYP2D6 - or to a lesser extent - include, for example, duloxetine, mirtazapine, citalopram and sertraline.- If it is not possible to avoid venlafaxine and side effects occur:1. reduce the dose2. monitor the effect and side effects or check the plasma concentrations of venlafaxine and O-desmethylvenlafaxineIt is not known whether it is possible to reduce the dose to such an extent that the side effects disappear, while the effectiveness is maintained. In general, it is assumed that the effectiveness is determined by the sum of the plasma concentrations of venlafaxine and O-desmethylvenlafaxine. However, the side effects do not appear to be related to this sum. Furthermore, a reduced effectiveness of venlafaxine has been observed in depression patients with this gene variation.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104968"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Alters systemic parent drug and metabolite concentrations. Consider dosage reductions.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "use": {},
+  "pimozide": {
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Use no more than the following doses (50% of the standard maximum dose):adults 10 mg/daychildren 0.05 mg/kg per day to a maximum of 2 mg/day",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166182819"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations. Dosages should not exceed 0.05 mg/kg in children or 4 mg/day in adults who are poor metabolizers and dosages should not be increased earlier than 14 days.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "quinidine": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for quinidine based on CYP2D6 genotypes.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182803"
+    }
+  },
+  "siponimod": {},
+  "bisoprolol": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for bisoprolol based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182816"
+    }
+  },
+  "flucytosine": {},
+  "zuclopenthixol": {
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Advise the prescriber to start with 50% of the standard dose or to choose an alternative according to the current guidelines. Antipsychotics that are not metabolised via CYP2D6 - or to a lesser extent - include, for example, flupentixol, quetiapine, olanzapine and clozapine.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104992"
+    }
+  },
+  "glibenclamide": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for glibenclamide based on CYP2C9 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104953"
+    }
+  },
+  "aripiprazole": {
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Administer no more than 10 mg/day or 300 mg/month (67-75% of the standard maximum dose of aripiprazole).",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104937"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations and higher adverse reaction risk. Dosage adjustment is recommended. Refer to FDA labeling for specific dosing recommendations.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "risperidone": {
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Use 67% of the standard dose. If problematic side effects originating in the central nervous system occur despite this reduced dose, then reduce the dose further to 50% of the standard dose.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104943"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Alters systemic parent drug and metabolite concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "clonidine": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for clonidine based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182818"
+    }
+  },
+  "fluphenazine": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for fluphenazine based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182812"
+    }
+  },
+  "tegafur": {},
+  "amiodarone": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for amiodarone based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182815"
+    }
+  },
+  "haloperidol": {
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "1. Advise the prescriber to: 1. decrease the initial dose to 50% of the standard initial dose and adjust the dose according to the effect, 2. or prescribe an alternative. Anti-psychotics that are not metabolised via CYP2D6 - or to a much lesser extent - include, for example, flupentixol, fluphenazine, quetiapine, olanzapine or clozapine.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166104988"
+    }
+  },
+  "sotalol": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for sotalol based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182855"
+    }
+  },
+  "clozapine": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for clozapine based on CYP2D6 genotypes.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104935"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations. Dosage reductions may be necessary.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "disopyramide": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for disopyramide based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182811"
+    }
+  },
+  "brexpiprazole": {
+    "dpwg": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Use half of the standard dose.",
+      "guideline": "https://www.pharmgkb.org/guidelineAnnotation/PA166184527"
+    },
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations. Dosage adjustment is recommended. Refer to FDA labeling for specific dosing recommendations.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "esomeprazole": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "No action is needed for this gene-drug interaction.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166104931"
+    }
+  },
+  "methylphenidate": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for methylphenidate based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182808"
+    }
+  },
+  "atenolol": {
+    "dpwg": {
+      "factors": {},
+      "recommendation": "There are currently no dosing recommendations for atenolol based on CYP2D6 genotype.\n",
+      "guideline": "https://pharmgkb.org/guidelineAnnotation/PA166182822"
+    }
+  },
+  "amifampridine": {},
+  "amifampridine phosphate": {},
+  "amphetamine": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "May affect systemic concentrations and adverse reaction risk. Consider lower starting dosage or use alternative agent.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "aripiprazole lauroxil": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations. Dosage adjustment is recommended. Refer to FDA labeling for specific dosing recommendations.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "belinostat": {},
+  "brivaracetam": {
+    "fda": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations and higher adverse reaction risk. Consider dosage reductions in poor metabolizers.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "clobazam": {
+    "fda": {
+      "factors": {
+        "CYP2C19": "intermediate metabolizer"
+      },
+      "recommendation": "Results in higher systemic active metabolite concentrations. Poor metabolism results in higher adverse reaction risk. Dosage adjustment is recommended. Refer to FDA labeling for specific dosing recommendations.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "deutetrabenazine": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations and adverse reaction risk (QT prolongation). The maximum recommended dosage should not exceed 36 mg (maximum single dose of 18 mg).",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "dronabinol": {},
+  "erdafitinib": {},
+  "flibanserin": {},
+  "iloperidone": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations and higher adverse reaction risk (QT prolongation). Reduce dosage by 50%.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "lofexidine": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations and higher adverse reaction risk. Monitor for orthostatic hypotension and bradycardia.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "meclizine": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "May affect systemic concentrations. Monitor for adverse reactions and clinical effect.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "metoclopramide": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations and higher adverse reaction risk. The recommended dosage is lower. Refer to FDA labeling for specific dosing recommendations.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "mivacurium": {},
+  "pitolisant": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations. Use lowest recommended starting dosage. Refer to FDA labeling for specific dosing recommendations.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "sacituzumab govitecan-hziy": {},
+  "tetrabenazine": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations. The maximum recommended single dose is 25 mg and should not exceed 50 mg/day.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "thioridazine": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations and higher adverse reaction risk (QT prolongation). Predicted effect based on experience with CYP2D6 inhibitors. Contraindicated in poor metabolizers.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "valbenazine": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic active metabolite concentrations and higher adverse reaction risk (QT prolongation). Dosage reductions may be necessary.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "vortioxetine": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations. The maximum recommended dose is 10 mg.",
+      "strength": "strong",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "cevimeline": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "May result in higher adverse reaction risk. Use with caution.",
+      "strength": "moderate",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "isoniazid": {},
+  "lapatinib": {},
+  "nilotinib": {},
+  "pazopanib": {},
+  "perphenazine": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations and higher adverse reaction risk.",
+      "strength": "moderate",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "procainamide": {},
+  "sulfamethoxazole and trimethoprim": {},
+  "sulfasalazine": {},
+  "tolterodine": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations and higher adverse reaction risk (QT prolongation).",
+      "strength": "moderate",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "amoxapine": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "May alter systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "avatrombopag": {},
+  "carisoprodol": {},
+  "darifenacin": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "diazepam": {},
+  "dolutegravir": {},
+  "donepezil": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Alters systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "elagolix": {},
+  "fesoterodine": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic active metabolite concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "galantamine": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations. Titrate dosage based on tolerability.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "hydralazine": {},
+  "mirabegron": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "nebivolol": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "May result in higher systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "propranolol": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "May affect systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "protriptyline": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  },
+  "raltegravir": {},
+  "tamsulosin": {
+    "fda": {
+      "factors": {
+        "CYP2D6": "poor metabolizer"
+      },
+      "recommendation": "Results in higher systemic concentrations. Predicted effect based on experience with CYP2D6 inhibitors. Use with caution.",
+      "strength": "optional",
+      "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations"
+    }
+  }
+}

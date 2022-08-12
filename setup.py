@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
 from pathlib import Path
-from click import style  # noqa E402
 
 from setuptools import setup
 
@@ -51,10 +50,8 @@ package(
     install_requires=[
         "loguru",
         "termcolor",
-        "psycopg2",
         "bs4",
-        "appdirs",
-        "pglast"
+        "appdirs"
     ],
     extras_require={
         "dev": [

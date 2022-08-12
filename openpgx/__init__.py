@@ -14,9 +14,9 @@ from openpgx.fda import create_fda_database
 from openpgx.helpers import words_to_sentence, get_database
 
 DATABASES = {
-    "cpic": create_cpic_database(),
-    "dpwg": create_dpwg_database(),
-    "fda": create_fda_database(),
+    "cpic": create_cpic_database,
+    "dpwg": create_dpwg_database,
+    "fda": create_fda_database,
 }
 
 
@@ -25,7 +25,7 @@ def index_recommendations(all_recommendations: list) -> dict:
 
     for recommendation in all_recommendations:
         result[recommendation["drug"]][recommendation["source"]].append(recommendation)
-
+    
     return result
 
 
@@ -54,13 +54,20 @@ def does_encoding_match_factor(encoding: str, factor: str) -> bool:
         - genotype (in HLA cases)
     
     """
+    
+    if type(encoding) == list:
+        for e in encoding:
+            if does_encoding_match_factor(e, factor):
+                return True
+        return False
+    
     # activity score: "== 2.00" and ">= 2.00"
-    if '= ' in encoding:
+    if '= ' in factor and type(encoding) != str:
         factor_operator, factor_value = factor[0:2], factor[2:]
         if factor_operator == "==":
-            return float(encoding) == float(factor_value)
+            return encoding == float(factor_value)
         elif factor_operator == ">=":
-            return float(encoding) >= float(factor_value)
+            return encoding >= float(factor_value)
 
     # In factors other than activity score (phenotype, genotype)
     return encoding == factor
@@ -144,12 +151,11 @@ def verify_vendor_database(data):
     recommendation_factor_names = [d["factors"] for d in data.values()]
 
 
-def create_database():
-    # TODO make default sources
+def create_database(sources: dict = {}):
     result = {}
 
-    for data in ["cpic", "dpwg", "fda"]:
-        result[data] = DATABASES[data]
+    for name in ["cpic", "dpwg", "fda"]:
+        result[name] = DATABASES[name](sources.get(name))
 
     return result
 
