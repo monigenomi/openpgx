@@ -51,7 +51,8 @@ package(
         "loguru",
         "termcolor",
         "bs4",
-        "appdirs"
+        "appdirs",
+        "numpy"
     ],
     extras_require={
         "dev": [
