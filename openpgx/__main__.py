@@ -14,7 +14,19 @@ from openpgx.helpers import (
 )
 
 
-def main(args: dict):
+def main():
+    logger.add(
+        sys.stderr, level="INFO", format="<level>{level: <8}</level> {message} {extra}"
+    )
+
+    parser = ArgumentParser(prog="openpgx")
+    parser.add_argument("positional", nargs="*")
+    parser.add_argument("-o", "--output", default="recommendations.json")
+    parser.add_argument("--cpic")
+    parser.add_argument("--dpwg")
+    parser.add_argument("--fda")
+    args = vars(parser.parse_args())
+    
     if "positional" not in args or len(args["positional"]) == 0:
         help = extract_usage(repository_path("README.md"))
         print(help)
@@ -33,16 +45,4 @@ def main(args: dict):
 
 
 if __name__ == "__main__":
-    logger.add(
-        sys.stderr, level="INFO", format="<level>{level: <8}</level> {message} {extra}"
-    )
-
-    parser = ArgumentParser(prog="openpgx")
-    parser.add_argument("positional", nargs="*")
-    parser.add_argument("-o", "--output", default="recommendations.json")
-    parser.add_argument("--cpic")
-    parser.add_argument("--dpwg")
-    parser.add_argument("--fda")
-    args = vars(parser.parse_args())
-
-    main(args)
+    main()
