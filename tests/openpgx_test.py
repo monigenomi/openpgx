@@ -109,6 +109,7 @@ def test_phenotyping():
     assert short_("TPMT", "*4/*10") == [
         "possible intermediate metabolizer", "intermediate metabolizer"
     ]
+    assert short_("F5", "Factor V Leiden heterozygous") == ["Factor V Leiden heterozygous"]
 
     # Activity score obligatory for DPYD
     # TODO: index is not sorted properly: 'DPYD:Reference/c.1898delC (*3)' why result is empty
@@ -224,3 +225,38 @@ def test_no_duplicate_factors_in_recommendations():
 
 def test_get_genotype_indexes():
     assert get_genotype_indexes("CYP2D6", "*2≥3/*1≥3") == []
+    
+
+def test_check_if_database_contains_proper_vkorc():
+    ace = create_database()["dpwg"]["recommendations"]["acenocoumarol"]
+    assert len(ace) == 3
+    assert type(ace) == list
+
+
+def test_issue3():
+    inputs = {
+      "F5": "Factor V Leiden heterozygous",
+      "VKORC1": "rs9923231 reference (C)",
+    }
+    issue3_reco = get_recommendations_for_patient(inputs)
+    assert issue3_reco["acenocoumarol"]["dpwg"] == [
+         {'factors': {'VKORC1': 'rs9923231 reference (C)'},
+          'guideline': 'https://www.pharmgkb.org/guidelineAnnotation/PA166104938',
+          'recommendation': 'NO action is needed for this gene-drug interaction'}]
+
+    assert issue3_reco["hormonal contraceptives for systemic use"]["dpwg"] == [{
+            'factors': {'F5': 'Factor V Leiden heterozygous'},
+            'guideline': 'https://www.pharmgkb.org/guidelineAnnotation/PA166104955',
+            'recommendation': '- If the patient has a FAMILY HISTORY WITH A LOT OF '
+                              'THROMBOSIS, or has had a PREVIOUS THROMBOSIS:1. Advise the '
+                              'prescriber to avoid the use of contraceptives that contain '
+                              'oestrogens and prescribe an on-hormone contraceptive-such '
+                              'as a copper IUD - as an alternative. One could also opt '
+                              'for a progestogen-only contraceptive method, such as the '
+                              'depot injection, an IUD with levonorgestrel or an implant '
+                              'with etonogestrel.- OTHER CASES:1. Advise the patient to '
+                              'avoid additional risk factors for thrombosis (obesity, '
+                              'smoking, etc.).'
+        }]
+    
+    
