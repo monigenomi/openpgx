@@ -9,7 +9,7 @@ database = get_database()
 
 def test_get_all_drugs():
     drugs = get_drugs(database)
-    assert len(drugs) == 253
+    assert len(drugs) == 254
 
 
 def test_recommendation_matches_genotype():
@@ -156,76 +156,41 @@ def test_get_recommendations_CYPS():
     # Test if "multiple gene" factors works
     recommendations = get_recommendations_for_patient({"CYP2D6": "*7/*7", "CYP2C19": "*1/*2"})
 
-    assert recommendations["trimipramine"]["cpic"] == {
+    assert recommendations["trimipramine"]["cpic"] == [{
         "factors": {"CYP2D6": "== 0.00", "CYP2C19": "intermediate metabolizer"},
         "recommendation": "Avoid trimipramine use. If a trimipramine is warranted, consider a 50% reduction of recommended starting dose. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
         "strength": "optional",
         "guideline": "https://cpicpgx.org/guidelines/guideline-for-tricyclic-antidepressants-and-cyp2d6-and-cyp2c19/",
-    }
+    }]
 
 
 def test_get_recommendations_with_multiple_factors():
     recommendations = get_recommendations_for_patient(
         {"HLA-A*31:01": "positive", "HLA-B*15:02": "negative"}
     )
-    assert recommendations["carbamazepine"]["cpic"] == {
+    assert recommendations["carbamazepine"]["cpic"] == [{
         "factors": {"HLA-A*31:01": "positive", "HLA-B*15:02": "negative"},
         "guideline": "https://cpicpgx.org/guidelines/guideline-for-carbamazepine-and-hla-b/",
         "recommendation": "If patient is carbamazepine-naïve and alternative agents "
         "are available, do not use carbamazepine.",
         "strength": "strong",
-    }
+    }]
 
 
 def test_get_recommendations_dpwg_by_activity_score():
     recommendations = get_recommendations_for_patient({"DPYD": "c.601A>C/c.2194G>A (*6)"})
-    assert recommendations["capecitabine"]["dpwg"]["factors"] == {"DPYD": "== 1.00"}
+    assert recommendations["capecitabine"]["dpwg"][0]["factors"] == {"DPYD": "== 1.00"}
 
 
 def test_compare_activity_score():
     for n in [2.0, 2]:
-        assert does_encoding_match_factor("Normal Metabolizer", n, ">= 1.5") == True
-        assert does_encoding_match_factor("Normal Metabolizer", n, ">= 2.0") == True
-        assert does_encoding_match_factor("Normal Metabolizer", n, ">= 2") == True
-        assert does_encoding_match_factor("Normal Metabolizer", n, ">= 2.5") == False
-        assert does_encoding_match_factor("Normal Metabolizer", n, "== 2") == True
-        assert does_encoding_match_factor("Normal Metabolizer", n, "== 2.0") == True
+        assert does_encoding_match_factor(n, ">= 1.5") == True
+        assert does_encoding_match_factor(n, ">= 2.0") == True
+        assert does_encoding_match_factor(n, ">= 2") == True
+        assert does_encoding_match_factor(n, ">= 2.5") == False
+        assert does_encoding_match_factor(n, "== 2") == True
+        assert does_encoding_match_factor(n, "== 2.0") == True
 
-    does_encoding_match_factor("Normal Metabolizer", 1.0, "Normal Metabolizer") == True
-    does_encoding_match_factor("*57:01 negative", 1.0, "*57:01 negative") == True
-    does_encoding_match_factor("Ultra Metabolizer", 1.0, "Normal Metabolizer") == False
-    does_encoding_match_factor(None, 1.0, None) == True
-    does_encoding_match_factor("Ultra Metabolizer", None, None) == False
-    does_encoding_match_factor(None, 1.0, "Ultra Metabolizer") == False
-
-
-def test_prepare_range():
-    assert prepare_range("*1x5") == ["*1x5", "*1≥5", "*1≥4", "*1≥3", "*1≥2", "*1≥1"]
-
-
-def test_no_no_results_in_recommendations():
-    for source, recommendations_by_drug in get_all_recommendations().items():
-        for drug, recommendations in recommendations_by_drug.items():
-            for r in recommendations:
-                assert r["recommendation"] != "No recommendation", r
-
-
-def test_no_duplicate_factors_in_recommendations():
-    for source, recommendations_by_drug in get_all_recommendations().items():
-        for drug, recommendations in recommendations_by_drug.items():
-            existing = {}
-            for recommendation in recommendations:
-                key = str(recommendation["factors"])
-                if key in existing:
-                    assert "Duplicate factors in recommendation", (
-                        str(recommendation) + "\n" + str(existing[key])
-                    )
-                existing[key] = recommendation
-
-
-def test_get_genotype_indexes():
-    assert get_genotype_indexes("CYP2D6", "*2≥3/*1≥3") == []
-    
 
 def test_check_if_database_contains_proper_vkorc():
     ace = create_database()["dpwg"]["recommendations"]["acenocoumarol"]
