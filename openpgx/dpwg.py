@@ -19,7 +19,9 @@ def extract_gene_name(dpwg_filename: str) -> str:
 
 
 def extract_drug_name(dpwg_filename: str) -> str:
-    return dpwg_filename.split("_and_")[0].split("_")[-1]
+    drug_gene = dpwg_filename.split("Annotation_of_DPWG_Guideline_for_")[1]
+    drug = drug_gene.split("_and_")[0]
+    return drug.replace("_", " ")
 
 
 def table_from_html(html_text: str) -> list:
@@ -208,11 +210,12 @@ def create_dpwg_database(url: Optional[str] = None) -> dict:
     drug_entries = [load_dpwg_entry(filename) for filename in glob.glob(wildcard)]
 
     recommendations = defaultdict(list)
-    encodings = defaultdict(set)
+    encodings = defaultdict(dict)
 
     for drug_data in drug_entries:
         drug_name = drug_data["drug"]
-
+        if drug_name == "acenocoumarol":
+            print("Hello")
         if len(drug_data["recommendations_by_factor"]) == 0:
             if (
                 "no action is needed for this gene-drug interaction"
@@ -262,9 +265,8 @@ def create_dpwg_database(url: Optional[str] = None) -> dict:
                 }
             )
 
-            if factor is not None and factor[:2] not in ["==", ">="]:
-                encodings[gene_name].add(factor)
+            if factor is not None and factor[:2] not in ["==", ">="] and factor not in ["poor metabolizer", "intermidiate metabolizer", "ultrarapid metabolizer", "normal metabolizer"]:
+                encodings[gene_name][factor] = [factor]
 
-    encodings = {k: sorted(list(v)) for k, v in encodings.items()}
 
     return {"recommendations": dict(recommendations), "encodings": dict(encodings)}

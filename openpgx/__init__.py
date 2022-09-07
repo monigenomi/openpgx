@@ -34,6 +34,16 @@ result = {}
 
 def get_best_recommendation(recommendations: list) -> dict:
     # TODO: probably more factors that number of factors needs to be considered
+    """
+    example:
+        {'factors': {'VKORC1': 'rs9923231 reference (C)'},
+          'guideline': 'https://www.pharmgkb.org/guidelineAnnotation/PA166104938',
+          'recommendation': 'NO action is needed for this gene-drug interaction'},
+         {'factors': {},
+          'guideline': 'https://pharmgkb.org/guidelineAnnotation/PA166104979',
+          'recommendation': 'There are currently no recommendations for acenocoumarol '
+                            'dosing based on CYP2C9 genotypes.\n'}]
+    """
     def score(recommendation):
         return len(recommendation["factors"].keys())
 
@@ -126,6 +136,7 @@ def get_recommendation_for_drug(database: dict, drug: str, encodings: str):
                 },
         "encodings" : {"CYP2D6": ["poor metabolizer", 0.0, ...}
     
+    Note: There can be more recommendations for single drug in single database (for example VKORC1 and CYP2C9 in dpwg)
     """
     if drug not in database["recommendations"]:
         return None
@@ -172,13 +183,16 @@ def phenotyping(genotypes: dict, database: dict ) -> dict:
     genotype: according to main input example.json
     database: dictionary with databases names as keys (cpic, fda, dpwg) and "recommendations" and "encodings"
     """
-    cpic_encodings = database["cpic"]["encodings"] #TODO implement encodings from DPWG and FDA also
+    cpic_encodings = database["cpic"]["encodings"]
+    dpwg_encodings = database["dpwg"]["encodings"]
+    fda_encodings = database["fda"]["encodings"] #TODO implement encodings from DPWG and FDA also
     phenotyping_result = {}
     for gene, genotype in genotypes.items():
         sorted_genotype = "/".join(sorted(genotype.split("/")))
         phenotyping_result[gene] = []
-        if gene in cpic_encodings and sorted_genotype in cpic_encodings[gene]:
-            phenotyping_result[gene] = cpic_encodings[gene][sorted_genotype]
+        for encodings in [cpic_encodings, dpwg_encodings]:
+            if gene in encodings and sorted_genotype in encodings[gene]:
+                phenotyping_result[gene] = encodings[gene][sorted_genotype]
     return phenotyping_result
     
     
@@ -207,14 +221,15 @@ def get_recommendations_for_patient(genotypes: dict) -> dict:
     genotypes_translated_to_encodings = phenotyping(genotypes, database)
 
     
-    for source, source_database in database.items():
-        for drug in drugs:
-            recommendations[drug] == defaultdict(dict)
+    for drug in drugs:
+        recommendations[drug] == defaultdict(list)
+        for source, source_database in database.items():
+            recommendations[drug][source] = []
             recommendation = get_recommendation_for_drug(
                 source_database, drug, genotypes_translated_to_encodings
             )
 
             if recommendation != None:
-                recommendations[drug][source] = recommendation
+                recommendations[drug][source].append(recommendation)
 
     return dict(recommendations)
