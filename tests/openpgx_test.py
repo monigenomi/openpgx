@@ -186,6 +186,23 @@ def test_get_recommendations_with_multiple_factors():
         "strength": "strong",
     }
 
+def test_take_any_recommendations_from_fda():
+    assert get_recommendations_for_patient({"CYP2D6": "*6/*6"})["cevimeline"]["fda"] == {'factors': {'CYP2D6': 'poor metabolizer'},
+             'guideline': 'https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations',
+             'recommendation': 'May result in higher adverse reaction risk. Use '
+                               'with caution.',
+             'strength': 'moderate'}
+
+
+def test_get_recommendations_for_HLA_DQA1_from_fda():
+    recommendations = get_recommendations_for_patient({"HLA-DQA1*02:01": "positive"})
+    assert recommendations["lapatinib"]["fda"] == {'factors': {'HLA-DQA1*02:01': 'positive'},
+             'guideline': 'https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations',
+             'recommendation': 'Results in higher adverse reaction risk '
+                               '(hepatotoxicity). Monitor liver function tests '
+                               'regardless of genotype.',
+             'strength': 'moderate'}
+
 
 def test_get_recommendations_dpwg_by_activity_score():
     recommendations = get_recommendations_for_patient({"DPYD": "c.601A>C/c.2194G>A (*6)"})
@@ -233,4 +250,4 @@ def test_issue3():
                               'smoking, etc.).'
         }
     
-    
+

@@ -190,7 +190,7 @@ def phenotyping(genotypes: dict, database: dict ) -> dict:
     for gene, genotype in genotypes.items():
         sorted_genotype = "/".join(sorted(genotype.split("/")))
         phenotyping_result[gene] = []
-        for encodings in [cpic_encodings, dpwg_encodings]:
+        for encodings in [cpic_encodings, dpwg_encodings, fda_encodings]:
             if gene in encodings:
                 if sorted_genotype in encodings[gene]:
                     phenotyping_result[gene] = encodings[gene][sorted_genotype]
