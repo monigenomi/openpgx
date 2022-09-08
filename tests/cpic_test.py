@@ -9,7 +9,7 @@ CPIC_RECOMMENDATIONS = CPIC_DATABASE["recommendations"]
 
 cwd = os.path.dirname(os.path.realpath(__file__))
 
-cached_sql_gz = download_to_cache_dir(CPIC_DEFAULT_URL)
+CACHED_SQL_GZ = download_to_cache_dir(CPIC_DEFAULT_URL)
 
 def test_get_alleles():
     assert get_alleles(
@@ -149,6 +149,7 @@ def test_create_cpic_recommendations():
 
 def test_check_guideline():
     def help():
+        dat = CPIC_DATABASE
         rec = CPIC_RECOMMENDATIONS
         result = []
         for drugname, values in rec.items():
@@ -260,3 +261,16 @@ def test_yield_rows_from_sql_file():
                             'reference': False,
                             'structuralvariation': False,
                             'version': '1'}]}
+
+
+CACHED_SQL_GZ = download_to_cache_dir(CPIC_DEFAULT_URL)
+LOADED_DATA = load_cpic_dump(CACHED_SQL_GZ)
+ENCODINGS = create_cpic_encodings(LOADED_DATA)
+
+
+def test_create_cpic_encodings_CYPS():
+    assert ENCODINGS["CYP2C19"]["*11/*17"] == ["rapid metabolizer", "ultrarapid metabolizer"]
+
+def test_create_cpic_encodings_HLA():
+    assert ENCODINGS["HLA-B*15:02"]["positive"] == ["positive"]
+    

@@ -170,7 +170,14 @@ def normalize_phenotype(phenotype: str) -> str:
                 return "ultrarapid metabolizer"
             return i + " metabolizer"
     return phenotype.lower()
-    
+
+def normalize_diplotype(diplotype: str) -> str:
+    if "positive" in diplotype:
+        return "positive"
+    if "negative" in diplotype:
+        return "negative"
+    return "/".join(sorted(diplotype.split("/")))
+
 
 def create_cpic_encodings(data) -> dict:
     result = defaultdict(lambda: defaultdict(list))
@@ -179,7 +186,7 @@ def create_cpic_encodings(data) -> dict:
     indexed_gene_result = index_items_by_key(data["gene_result"], "id")
 
     for diplotype_row in data["gene_result_diplotype"]:
-        diplotype = "/".join(sorted(diplotype_row["diplotype"].split("/")))
+        diplotype = normalize_diplotype(diplotype_row["diplotype"])
         phenotypes = indexed_gene_result_lookup[diplotype_row["functionphenotypeid"]]
         gene_result = indexed_gene_result[phenotypes[0]["phenotypeid"]][0]
         genename = normalize_genename(gene_result["genesymbol"], diplotype)

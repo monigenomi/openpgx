@@ -151,6 +151,16 @@ def test_phenotyping():
         "intermediate metabolizer", 1.0
     ]
 
+def test_phenotyping_multiple():
+    assert phenotyping({"HLA-A*31:01": "positive", "HLA-B*15:02": "negative"}, database) == {
+        "HLA-A*31:01": [
+              "positive"
+            ],
+        "HLA-B*15:02": [
+                "negative"
+            ]
+        }
+    
 
 def test_get_recommendations_CYPS():
     # Test if "multiple gene" factors works
