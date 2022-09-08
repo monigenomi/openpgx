@@ -224,12 +224,11 @@ def get_recommendations_for_patient(genotypes: dict) -> dict:
     for drug in drugs:
         recommendations[drug] == defaultdict(list)
         for source, source_database in database.items():
-            recommendations[drug][source] = []
             recommendation = get_recommendation_for_drug(
                 source_database, drug, genotypes_translated_to_encodings
             )
 
             if recommendation != None:
-                recommendations[drug][source].append(recommendation)
+                recommendations[drug][source] = recommendation
 
     return dict(recommendations)
