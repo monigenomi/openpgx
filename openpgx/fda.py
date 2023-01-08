@@ -88,7 +88,7 @@ def create_fda_database(url: Optional[str] = None) -> dict:
     entries = read_fda_entries(fda_json_path)
 
     recommendations = defaultdict(list)
-    encodings = defaultdict(set)
+    encodings = defaultdict(dict)
 
     for entry in entries:
         gene_name = entry["Gene"]
@@ -107,9 +107,9 @@ def create_fda_database(url: Optional[str] = None) -> dict:
                     "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations",
                 }
             )
+            if factor is not None and factor[:2] not in ["==", ">="] and factor not in ["poor metabolizer", "intermediate metabolizer", "ultrarapid metabolizer", "normal metabolizer", "intermediate function", "poor function"]:
+                encodings[gene][factor] = [factor]
 
-            encodings[drug].add(factor)
-
-    encodings = {k: sorted(list(v)) for k, v in encodings.items()}
+#    encodings = {k: sorted(list(v)) for k, v in encodings.items()}
 
     return {"recommendations": dict(recommendations), "encodings": dict(encodings)}

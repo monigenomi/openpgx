@@ -131,7 +131,7 @@ def test_phenotyping():
     # assert short_("VKORC1", "rs9923231 reference (C)") == (
     #     #TODO check this case
     #     "rs9923231 reference (C)",
-    # )
+    # )s
 
     # HLA-B*44: Gene and allele exists only in dpwg but recommendation is default whether genotype is given or not
     # assert short_("HLA-B*44", "positive") == ["positive"]
@@ -151,35 +151,62 @@ def test_phenotyping():
         "intermediate metabolizer", 1.0
     ]
 
+def test_phenotyping_multiple():
+    assert phenotyping({"HLA-A*31:01": "positive", "HLA-B*15:02": "negative"}, database) == {
+        "HLA-A*31:01": [
+              "positive"
+            ],
+        "HLA-B*15:02": [
+                "negative"
+            ]
+        }
+    
 
 def test_get_recommendations_CYPS():
     # Test if "multiple gene" factors works
     recommendations = get_recommendations_for_patient({"CYP2D6": "*7/*7", "CYP2C19": "*1/*2"})
 
-    assert recommendations["trimipramine"]["cpic"] == [{
+    assert recommendations["trimipramine"]["cpic"] == {
         "factors": {"CYP2D6": "== 0.00", "CYP2C19": "intermediate metabolizer"},
         "recommendation": "Avoid trimipramine use. If a trimipramine is warranted, consider a 50% reduction of recommended starting dose. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
         "strength": "optional",
         "guideline": "https://cpicpgx.org/guidelines/guideline-for-tricyclic-antidepressants-and-cyp2d6-and-cyp2c19/",
-    }]
+    }
 
 
 def test_get_recommendations_with_multiple_factors():
     recommendations = get_recommendations_for_patient(
         {"HLA-A*31:01": "positive", "HLA-B*15:02": "negative"}
     )
-    assert recommendations["carbamazepine"]["cpic"] == [{
+    assert recommendations["carbamazepine"]["cpic"] == {
         "factors": {"HLA-A*31:01": "positive", "HLA-B*15:02": "negative"},
         "guideline": "https://cpicpgx.org/guidelines/guideline-for-carbamazepine-and-hla-b/",
         "recommendation": "If patient is carbamazepine-naïve and alternative agents "
         "are available, do not use carbamazepine.",
         "strength": "strong",
-    }]
+    }
+
+def test_take_any_recommendations_from_fda():
+    assert get_recommendations_for_patient({"CYP2D6": "*6/*6"})["cevimeline"]["fda"] == {'factors': {'CYP2D6': 'poor metabolizer'},
+             'guideline': 'https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations',
+             'recommendation': 'May result in higher adverse reaction risk. Use '
+                               'with caution.',
+             'strength': 'moderate'}
+
+
+def test_get_recommendations_for_HLA_DQA1_from_fda():
+    recommendations = get_recommendations_for_patient({"HLA-DQA1*02:01": "positive"})
+    assert recommendations["lapatinib"]["fda"] == {'factors': {'HLA-DQA1*02:01': 'positive'},
+             'guideline': 'https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations',
+             'recommendation': 'Results in higher adverse reaction risk '
+                               '(hepatotoxicity). Monitor liver function tests '
+                               'regardless of genotype.',
+             'strength': 'moderate'}
 
 
 def test_get_recommendations_dpwg_by_activity_score():
     recommendations = get_recommendations_for_patient({"DPYD": "c.601A>C/c.2194G>A (*6)"})
-    assert recommendations["capecitabine"]["dpwg"][0]["factors"] == {"DPYD": "== 1.00"}
+    assert recommendations["capecitabine"]["dpwg"]["factors"] == {"DPYD": "== 1.00"}
 
 
 def test_compare_activity_score():
@@ -204,12 +231,11 @@ def test_issue3():
       "VKORC1": "rs9923231 reference (C)",
     }
     issue3_reco = get_recommendations_for_patient(inputs)
-    assert issue3_reco["acenocoumarol"]["dpwg"] == [
-         {'factors': {'VKORC1': 'rs9923231 reference (C)'},
+    assert issue3_reco["acenocoumarol"]["dpwg"] == {'factors': {'VKORC1': 'rs9923231 reference (C)'},
           'guideline': 'https://www.pharmgkb.org/guidelineAnnotation/PA166104938',
-          'recommendation': 'NO action is needed for this gene-drug interaction'}]
+          'recommendation': 'NO action is needed for this gene-drug interaction'}
 
-    assert issue3_reco["hormonal contraceptives for systemic use"]["dpwg"] == [{
+    assert issue3_reco["hormonal contraceptives for systemic use"]["dpwg"] == {
             'factors': {'F5': 'Factor V Leiden heterozygous'},
             'guideline': 'https://www.pharmgkb.org/guidelineAnnotation/PA166104955',
             'recommendation': '- If the patient has a FAMILY HISTORY WITH A LOT OF '
@@ -222,6 +248,6 @@ def test_issue3():
                               'with etonogestrel.- OTHER CASES:1. Advise the patient to '
                               'avoid additional risk factors for thrombosis (obesity, '
                               'smoking, etc.).'
-        }]
+        }
     
-    
+

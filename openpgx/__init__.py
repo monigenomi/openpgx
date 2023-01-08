@@ -190,9 +190,10 @@ def phenotyping(genotypes: dict, database: dict ) -> dict:
     for gene, genotype in genotypes.items():
         sorted_genotype = "/".join(sorted(genotype.split("/")))
         phenotyping_result[gene] = []
-        for encodings in [cpic_encodings, dpwg_encodings]:
-            if gene in encodings and sorted_genotype in encodings[gene]:
-                phenotyping_result[gene] = encodings[gene][sorted_genotype]
+        for encodings in [cpic_encodings, dpwg_encodings, fda_encodings]:
+            if gene in encodings:
+                if sorted_genotype in encodings[gene]:
+                    phenotyping_result[gene] = encodings[gene][sorted_genotype]
     return phenotyping_result
     
     
@@ -224,12 +225,11 @@ def get_recommendations_for_patient(genotypes: dict) -> dict:
     for drug in drugs:
         recommendations[drug] == defaultdict(list)
         for source, source_database in database.items():
-            recommendations[drug][source] = []
             recommendation = get_recommendation_for_drug(
                 source_database, drug, genotypes_translated_to_encodings
             )
 
             if recommendation != None:
-                recommendations[drug][source].append(recommendation)
+                recommendations[drug][source] = recommendation
 
     return dict(recommendations)

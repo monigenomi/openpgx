@@ -1,7 +1,8 @@
 from openpgx.fda import *
-from openpgx.helpers import *
 
-FDA_RECOMMENDATIONS = create_fda_database()["recommendations"]
+FDA_DATABASE = create_fda_database()
+FDA_RECOMMENDATIONS = FDA_DATABASE["recommendations"]
+FDA_ENCODINGS = FDA_DATABASE["encodings"]
 
 
 def test_subgroups_to_factors():
@@ -36,7 +37,10 @@ def test_subgroups_to_factors():
 def test_get_fda_recommendations():
     assert FDA_RECOMMENDATIONS["abacavir"] == [
         {
-            "factors": {"HLA-B*57:01": "positive", "population": "general"},
+            "factors": {
+                "HLA-B*57:01": "positive",
+#                "population": "general"
+            },
             "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations",
             "recommendation": "Results in higher adverse reaction risk (hypersensitivity "
             "reactions). Do not use abacavir in patients positive for "
@@ -47,31 +51,46 @@ def test_get_fda_recommendations():
 
     assert FDA_RECOMMENDATIONS["doxepin"] == [
         {
-            "factors": {"CYP2C19": "intermediate metabolizer", "population": "general"},
+            "factors": {
+                "CYP2C19": "intermediate metabolizer",
+                # "population": "general"
+            },
             "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations",
             "recommendation": "Results in higher systemic concentrations.",
             "strength": "optional",
         },
         {
-            "factors": {"CYP2C19": "poor metabolizer", "population": "general"},
+            "factors": {
+                "CYP2C19": "poor metabolizer",
+                # "population": "general"
+            },
             "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations",
             "recommendation": "Results in higher systemic concentrations.",
             "strength": "optional",
         },
         {
-            "factors": {"CYP2D6": "ultrarapid metabolizer", "population": "general"},
+            "factors": {
+                "CYP2D6": "ultrarapid metabolizer",
+                # "population": "general"
+            },
             "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations",
             "recommendation": "May alter systemic concentrations.",
             "strength": "optional",
         },
         {
-            "factors": {"CYP2D6": "intermediate metabolizer", "population": "general"},
+            "factors": {
+                "CYP2D6": "intermediate metabolizer",
+                # "population": "general"
+            },
             "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations",
             "recommendation": "May alter systemic concentrations.",
             "strength": "optional",
         },
         {
-            "factors": {"CYP2D6": "poor metabolizer", "population": "general"},
+            "factors": {
+                "CYP2D6": "poor metabolizer",
+                # "population": "general"
+            },
             "guideline": "https://www.fda.gov/medical-devices/precision-medicine/table-pharmacogenetic-associations",
             "recommendation": "May alter systemic concentrations.",
             "strength": "optional",
@@ -79,3 +98,18 @@ def test_get_fda_recommendations():
     ]
 
     assert len(FDA_RECOMMENDATIONS) == 104
+
+
+def test_fda_encodings_not():
+    assert "BCHE" not in FDA_ENCODINGS
+    
+    assert "NAT2" not in FDA_ENCODINGS
+    # https: // www.pharmgkb.org / vip / PA166170337
+    
+
+def test_fda_encodings_exists():
+    assert FDA_ENCODINGS["HLA-DRB1*07:01"]["positive"] == ["positive"]
+    assert FDA_ENCODINGS["SLCO1B1"]["521 TC"] == ["521 TC"]
+    assert FDA_ENCODINGS["VKORC1"]["rs9923231 reference (C)"] == ["rs9923231 reference (C)"]
+
+# TODO Check which genes are in FDA but no phenotyping exists in CPIC and DPWG

@@ -214,8 +214,6 @@ def create_dpwg_database(url: Optional[str] = None) -> dict:
 
     for drug_data in drug_entries:
         drug_name = drug_data["drug"]
-        if drug_name == "acenocoumarol":
-            print("Hello")
         if len(drug_data["recommendations_by_factor"]) == 0:
             if (
                 "no action is needed for this gene-drug interaction"
